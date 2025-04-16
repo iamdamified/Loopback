@@ -35,7 +35,7 @@ class ProfileUserView(RetrieveUpdateAPIView):
     serializer_class = ProfileSerializer
     permission_classes = [IsAuthenticated]
     pagination_class = PageNumberPagination
-    # lookup_field = "id"
+    lookup_field = "id"
 
     def get_object(self):
         return self.request.user.profile

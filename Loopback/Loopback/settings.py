@@ -148,3 +148,10 @@ REST_FRAMEWORK = {
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
     'PAGE_SIZE': 1
 }
+
+
+EMAIL_BACKEND = 'anymail.backends.mailgun.EmailBackend'
+ANYMAIL = {
+    'MAILGUN_API_KEY': 'your_mailgun_api_key',
+    'MAILGUN_SENDER_DOMAIN': 'your_mailgun_domain',
+}
