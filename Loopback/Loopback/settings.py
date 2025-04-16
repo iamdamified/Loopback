@@ -150,8 +150,19 @@ REST_FRAMEWORK = {
 }
 
 
-EMAIL_BACKEND = 'anymail.backends.mailgun.EmailBackend'
-ANYMAIL = {
-    'MAILGUN_API_KEY': 'your_mailgun_api_key',
-    'MAILGUN_SENDER_DOMAIN': 'your_mailgun_domain',
-}
+# EMAIL_BACKEND = 'anymail.backends.mailgun.EmailBackend'
+# ANYMAIL = {
+#     'MAILGUN_API_KEY': 'your_mailgun_api_key',
+#     'MAILGUN_SENDER_DOMAIN': 'your_mailgun_domain',
+# }
+
+
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+
+EMAIL_HOST_USER = config("EMAIL_HOST_USER")  # your Gmail address
+EMAIL_HOST_PASSWORD = config("EMAIL_HOST_PASSWORD")  # 16-digit app password from Google
+
+DEFAULT_FROM_EMAIL = 'Loopback <adekoyadamilareofficial@gmail.com>'
