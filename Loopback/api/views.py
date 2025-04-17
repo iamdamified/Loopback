@@ -39,6 +39,8 @@ User = get_user_model()
 #         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
+
+# User Registrations with Verification
 class RegisterView(APIView):
     def post(self, request):
         username = request.data['username']
@@ -53,7 +55,7 @@ class RegisterView(APIView):
         token = default_token_generator.make_token(user)
         uid = user.pk
 
-        verify_url = f"http://localhost:8000/api/verify-email/{uid}/{token}/"
+        verify_url = f"http://localhost:8000/api/auth/verify-email/{uid}/{token}/"
 
         send_mail(
             subject="Verify your Email",
@@ -114,7 +116,7 @@ class ProfileUserView(RetrieveUpdateAPIView):
     serializer_class = ProfileSerializer
     permission_classes = [IsAuthenticated]
     pagination_class = PageNumberPagination
-    # lookup_field = "id"
+    lookup_field = "id"
 
     def get_object(self):
         return self.request.user.profile
