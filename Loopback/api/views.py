@@ -1,11 +1,11 @@
 from django.shortcuts import render
-from users.models import Profile
-from .serializers import UserSerializer, ProfileSerializer, CustomTokenObtainPairSerializer
+from users.models import Profile, Mentorship, Goal
+from .serializers import UserSerializer, ProfileSerializer, CustomTokenObtainPairSerializer, GoalSerializer, MentorshipSerializer
 from rest_framework.generics import ListCreateAPIView, RetrieveUpdateAPIView
 from rest_framework.views import APIView
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
-from rest_framework import permissions, status
+from rest_framework import permissions, status, viewsets
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.pagination import PageNumberPagination
 from rest_framework_simplejwt.tokens import RefreshToken
@@ -123,9 +123,33 @@ class ProfileUserView(RetrieveUpdateAPIView):
 
 
 
+class IsParticipant(permissions.BasePermission):
+    def has_object_permission(self, request, view, obj):
+        return object.mentor == request.user or obj.mentee == request.User
+    
+class MentorshipViewSet(viewsets.ModelViewSet):
+    queryset = Mentorship.objects.all()
+    serializer_class = MentorshipSerializer
+    permission_classes = [IsAuthenticated, IsParticipant]
+
+    def get_queryset(self):
+        user = self.request.user
+        return Mentorship.objects.filter(models.Q(mentor=user) | models.Q(mentee=user))
+    
+    def perform_create(self, serializer):
+        serializer.save()
 
 
+class GoalViewSet(viewsets.ModelViewSet):
+    queryset = Goal.objects.all()
+    serializer_class = GoalSerializer
+    permission_classes = [IsAuthenticated]
 
+    def get_queryset(self):
+        return Goal.objects.filter(loop_mentor=self.request.user) | Goal.objects.filter(loop_mentee=self.request.user)
+    
+    def perform_create(self, serializer):
+        serializer.save(created_by=self.request.user)
 
 
 

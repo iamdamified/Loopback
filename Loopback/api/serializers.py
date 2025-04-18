@@ -1,4 +1,4 @@
-from users.models import User, Profile
+from users.models import User, Profile, Mentorship, Goal
 from rest_framework import serializers
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 
@@ -35,3 +35,19 @@ class ProfileSerializer(serializers.ModelSerializer):
     class Meta:
         model = Profile
         fields = ['user', 'bio', 'interests', 'goals', 'skills', 'experience']
+
+
+class GoalSerializer(serializers.ModelSerializer):
+    class Meta:
+        models = Goal
+        fields = '__all__'
+        read_only_fields = ['created_by']
+
+
+class MentorshipSerializer(serializers.ModelSerializer):
+    goals = GoalSerializer(many=True, read_only=True)
+
+    class Meta:
+        model = Mentorship
+        fields = '__all__'
+        read_only_fields = ['status']
