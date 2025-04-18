@@ -57,6 +57,6 @@ class Goal(models.Model):
     completed = models.BooleanField(default=False)
 
     def __str__(self):
-        return self.title + ' - ' + 'Loop ID:' + self.loop.id
+        return self.title + ' - ' + 'Loop ID:' + ' - ' + self.loop.id
     
 

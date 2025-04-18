@@ -42,8 +42,7 @@ INSTALLED_APPS = [
     'users',
     'api',
     'rest_framework',
-    'rest_framework_simplejwt',
-
+    'rest_framework_simplejwt'
 ]
 
 MIDDLEWARE = [
@@ -157,15 +156,28 @@ REST_FRAMEWORK = {
 # }
 
 
-EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-EMAIL_HOST = 'smtp.gmail.com'
-EMAIL_PORT = 587
-EMAIL_USE_TLS = True
-# EMAIL_PORT = 465
-# EMAIL_USE_SSL = False
+# EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+# EMAIL_HOST = 'smtp.gmail.com'
+# EMAIL_PORT = 587
+# EMAIL_USE_TLS = True
+
+# EMAIL_HOST_USER = config("EMAIL_HOST_USER")  # your Gmail address
+# EMAIL_HOST_PASSWORD = config("EMAIL_HOST_PASSWORD")  # 16-digit app password from Google
+
+# DEFAULT_FROM_EMAIL = 'Loopback <adekoyadamilareofficial@gmail.com>'
 
 
-EMAIL_HOST_USER = config("EMAIL_HOST_USER")  # your Gmail address
-EMAIL_HOST_PASSWORD = config("EMAIL_HOST_PASSWORD")  # 16-digit app password from Google
 
-DEFAULT_FROM_EMAIL = 'Loopback <adekoyadamilareofficial@gmail.com>'
+# EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
+# EMAIL_HOST = "smtp.sendgrid.net"
+# EMAIL_PORT = 587
+# EMAIL_USE_TLS = True
+# EMAIL_HOST_USER = "apikey"  # This stays as 'apikey'
+# EMAIL_HOST_PASSWORD = config("EMAIL_HOST_PASSWORD")  # Paste your actual API key here
+# DEFAULT_FROM_EMAIL = config("DEFAULT_FROM_EMAIL")
+
+
+DEFAULT_FROM_EMAIL = config("DEFAULT_FROM_EMAIL")
+EMAIL_BACKEND = "sendgrid_backend.SendgridBackend"
+SENDGRID_SANDBOX_MODE_IN_DEBUG = False
+SENDGRID_API_KEY = config("SENDGRID_API_KEY")
