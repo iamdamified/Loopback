@@ -1,28 +1,11 @@
-from users.models import User, Profile, Mentorship, Goal
+from users.models import User, Profile, Mentorship, Goal, Weeklycheckin
 from rest_framework import serializers
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 
 
-# AUTHENTICATION SERIALIZER FOR API
-class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
-    def validate(self, attrs):
-        data = super().validate(attrs)
-        if not self.user.verified:
-            raise serializers.ValidationError('Please verify your email before logging in.')
-        data['user_id'] = self.user.id
-        data['role'] = self.user.role
-        return data
 
 
-
-# class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
-#     def validate(self, attrs):
-#         data = super().validate(attrs)
-        
-#         data['role'] = self.user.role
-#         return data
-
-
+# USERS INFORMATION SERIALIZERS
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
@@ -36,6 +19,31 @@ class ProfileSerializer(serializers.ModelSerializer):
         model = Profile
         fields = ['user', 'bio', 'interests', 'goals', 'skills', 'experience']
 
+
+
+# AUTHENTICATION SERIALIZER FOR API
+class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
+    def validate(self, attrs):
+        data = super().validate(attrs)
+        if not self.user.verified:
+            raise serializers.ValidationError('Please verify your email before logging in.')
+        data['user_id'] = self.user.id
+        data['role'] = self.user.role
+        return data
+
+
+# class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
+#     def validate(self, attrs):
+#         data = super().validate(attrs)
+        
+#         data['role'] = self.user.role
+#         return data
+
+
+
+
+
+# LOOP SERIALIZERS
 
 class GoalSerializer(serializers.ModelSerializer):
     class Meta:
@@ -51,3 +59,24 @@ class MentorshipSerializer(serializers.ModelSerializer):
         model = Mentorship
         fields = '__all__'
         read_only_fields = ['status']
+
+
+
+
+# WEEKLY CHECKINS SERIALIZERS
+class WeeklycheckinSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Weeklycheckin
+        fields = '__all__'
+        read_only_fields = ['created_by', 'created']
+
+
+
+
+
+
+
+
+
+
+

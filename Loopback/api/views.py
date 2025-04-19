@@ -1,6 +1,6 @@
 from django.shortcuts import render
-from users.models import Profile, Mentorship, Goal
-from .serializers import UserSerializer, ProfileSerializer, CustomTokenObtainPairSerializer, GoalSerializer, MentorshipSerializer
+from users.models import Profile, Mentorship, Goal, Weeklycheckin
+from .serializers import UserSerializer, ProfileSerializer, CustomTokenObtainPairSerializer, GoalSerializer, MentorshipSerializer, WeeklycheckinSerializer
 from rest_framework.generics import ListCreateAPIView, RetrieveUpdateAPIView
 from rest_framework.views import APIView
 from rest_framework.decorators import api_view
@@ -148,6 +148,15 @@ class GoalViewSet(viewsets.ModelViewSet):
     def get_queryset(self):
         return Goal.objects.filter(loop_mentor=self.request.user) | Goal.objects.filter(loop_mentee=self.request.user)
     
+    def perform_create(self, serializer):
+        serializer.save(created_by=self.request.user)
+
+
+class WeeklycheckinViewSet(viewsets.ModelViewSet):
+    queryset = Weeklycheckin.objects.all()
+    serializer_class = WeeklycheckinSerializer
+    permission_classes = [IsAuthenticated]
+
     def perform_create(self, serializer):
         serializer.save(created_by=self.request.user)
 

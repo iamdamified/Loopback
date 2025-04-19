@@ -1,12 +1,13 @@
 from django.urls import path
 from rest_framework.authtoken.views import obtain_auth_token
-from .views import CustomTokenView, RegisterView, VerifyEmailView, ProfileUserView, LoginView, MentorshipViewSet, GoalViewSet
+from .views import CustomTokenView, RegisterView, VerifyEmailView, ProfileUserView, LoginView, MentorshipViewSet, GoalViewSet, WeeklycheckinViewSet
 from rest_framework_simplejwt.views import TokenRefreshView
 from rest_framework.routers import DefaultRouter
 
 router = DefaultRouter()
 router.register(r'loops', MentorshipViewSet)
 router.register(r'goals', GoalViewSet)
+router.register(r'checkins', WeeklycheckinViewSet)
 
 urlpatterns = router.urls
 

@@ -1,6 +1,6 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
-from .models import User, Profile, Mentorship, Goal
+from .models import User, Profile, Mentorship, Goal, Weeklycheckin, LoopFeedback
 #
 
 # Register your models here.
@@ -19,3 +19,7 @@ admin.site.register(Profile)
 admin.site.register(Mentorship)
 
 admin.site.register(Goal)
+
+admin.site.register(Weeklycheckin)
+
+admin.site.register(LoopFeedback)
