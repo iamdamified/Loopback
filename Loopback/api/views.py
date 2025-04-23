@@ -1,6 +1,6 @@
 from django.shortcuts import render
-from users.models import Profile, Mentorship, Goal, Weeklycheckin
-from .serializers import UserSerializer, ProfileSerializer, CustomTokenObtainPairSerializer, GoalSerializer, MentorshipSerializer, WeeklycheckinSerializer
+from users.models import Profile, Mentorship, Goal, Weeklycheckin, LoopFeedback
+from .serializers import UserSerializer, ProfileSerializer, CustomTokenObtainPairSerializer, GoalSerializer, MentorshipSerializer, WeeklycheckinSerializer, LoopFeedbackSerializer
 from rest_framework.generics import ListCreateAPIView, RetrieveUpdateAPIView
 from rest_framework.views import APIView
 from rest_framework.decorators import api_view
@@ -15,6 +15,13 @@ from django.contrib.auth.tokens import default_token_generator
 from django.core.mail import send_mail
 from django.urls import reverse
 from django.conf import settings
+
+from allauth.socialaccount.providers.google.views import GoogleOAuth2Adapter
+from dj_rest_auth.registration.views import SocialLoginView
+
+# Social login view
+class GoogleLogin(SocialLoginView):
+    adapter_class = GoogleOAuth2Adapter
 
 
 class CustomTokenView(TokenObtainPairView):
@@ -162,7 +169,15 @@ class WeeklycheckinViewSet(viewsets.ModelViewSet):
 
 
 
+class LoopFeedbackViewSet(viewsets.ModelViewSet):
+    queryset = LoopFeedback.objects.all()
+    serializer_class = LoopFeedbackSerializer
+    permission_classes = [IsAuthenticated]
+    
+    
 
+    def perform_create(self, serializer):
+        serializer.save(created_by=self.request.user)
 
 
 

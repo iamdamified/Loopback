@@ -30,6 +30,19 @@ DEBUG = True
 ALLOWED_HOSTS = []
 
 
+# Google Auto Verification
+
+SITE_ID = 1
+
+REST_USE_JWT = True
+# TOKEN_MODEL = None
+
+ACCOUNT_AUTHENTICATION_METHOD = 'email'  # or 'username' or 'username_email' or 'email'
+ACCOUNT_EMAIL_REQUIRED = True
+# ACCOUNT_USERNAME_REQUIRED = False  # If you want email-only login
+ACCOUNT_EMAIL_VERIFICATION = 'none' # 'mandatory' or 'none' or 'optional'
+SOCIALACCOUNT_QUERY_EMAIL = True
+
 # Application definition
 
 INSTALLED_APPS = [
@@ -42,7 +55,19 @@ INSTALLED_APPS = [
     'users',
     'api',
     'rest_framework',
-    'rest_framework_simplejwt'
+    'rest_framework_simplejwt',
+    'rest_framework.authtoken',
+    'rest_framework_simplejwt.token_blacklist',
+
+
+    'django.contrib.sites',  # Required for allauth(Google auto login)
+    'allauth',
+    'allauth.account',
+    'allauth.socialaccount',
+    'allauth.socialaccount.providers.google',
+    'dj_rest_auth',
+    'dj_rest_auth.registration',
+
 ]
 
 MIDDLEWARE = [
@@ -53,6 +78,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'allauth.account.middleware.AccountMiddleware',
 ]
 
 ROOT_URLCONF = 'Loopback.urls'
@@ -149,11 +175,28 @@ REST_FRAMEWORK = {
 }
 
 
-# EMAIL_BACKEND = 'anymail.backends.mailgun.EmailBackend'
-# ANYMAIL = {
-#     'MAILGUN_API_KEY': 'your_mailgun_api_key',
-#     'MAILGUN_SENDER_DOMAIN': 'your_mailgun_domain',
-# }
+from datetime import timedelta
+
+SIMPLE_JWT = {
+    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=30),
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=1),
+    'ROTATE_REFRESH_TOKENS': True,
+    'BLACKLIST_AFTER_ROTATION': True,
+    'AUTH_HEADER_TYPES': ('Bearer',),
+}
+
+
+SOCIALACCOUNT_PROVIDERS = {
+    'google': {
+        'APP': {
+            'client_id': config('GOOGLE_CLIENT_ID'),
+            'secret': config('GOOGLE_SECRET'),
+            'key': ''
+        }
+    }
+}
+
+
 
 
 # EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
@@ -181,3 +224,4 @@ DEFAULT_FROM_EMAIL = config("DEFAULT_FROM_EMAIL")
 EMAIL_BACKEND = "sendgrid_backend.SendgridBackend"
 SENDGRID_SANDBOX_MODE_IN_DEBUG = False
 SENDGRID_API_KEY = config("SENDGRID_API_KEY")
+

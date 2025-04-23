@@ -1,4 +1,4 @@
-from users.models import User, Profile, Mentorship, Goal, Weeklycheckin
+from users.models import User, Profile, Mentorship, Goal, Weeklycheckin, LoopFeedback
 from rest_framework import serializers
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 
@@ -74,7 +74,11 @@ class WeeklycheckinSerializer(serializers.ModelSerializer):
 
 
 
-
+class LoopFeedbackSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = LoopFeedback
+        fields = '__all__'
+        read_only_fields = ['created_by', 'created']
 
 
 

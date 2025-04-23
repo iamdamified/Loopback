@@ -4,6 +4,7 @@ from django.conf import settings
 
 # Create your models here.
 
+# USER INFORMATION
 class User(AbstractUser):
     ROLE_CHOICES = (
         ('mentor', 'Mentor'),
@@ -29,7 +30,8 @@ class Profile(models.Model):
         return f"{self.user.username}'s Profile"
 
 
-
+# LOOP INFORMATION FOR ORGANISATION
+# This is a mentorship loop between a mentor and a mentee.
 class Mentorship(models.Model):
     STATUS_CHOICES = (
         ('waiting', 'Waiting'),
@@ -61,7 +63,7 @@ class Goal(models.Model):
     
 
 
-
+# Monitoring Tool/Process
 class Weeklycheckin(models.Model):
     loop = models.ForeignKey("Mentorship", on_delete=models.CASCADE, related_name="checkins")
     created_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
@@ -80,7 +82,7 @@ class Weeklycheckin(models.Model):
 
 
 
-
+# Success Measurement for Goal achievement
 class LoopFeedback(models.Model):
     loop = models.ForeignKey("Mentorship", on_delete=models.CASCADE, related_name="feedbacks")
     created_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
