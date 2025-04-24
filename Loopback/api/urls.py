@@ -6,7 +6,7 @@ from rest_framework.routers import DefaultRouter
 from .views import GoogleLogin
 
 router = DefaultRouter()
-router.register(r'loops', MentorshipViewSet)
+router.register(r'loops', MentorshipViewSet, basename='')
 router.register(r'goals', GoalViewSet)
 router.register(r'checkins', WeeklycheckinViewSet)
 router.register(r'loop-feedbacks', LoopFeedbackViewSet)

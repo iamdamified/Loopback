@@ -23,11 +23,10 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/auth/', include('api.urls')),
 
-    # path('auth/registration/', include('dj_rest_auth.registration.urls')),# Google registration
-    
+    path('auth/registration/', include('dj_rest_auth.registration.urls')),# Google registration
     path('accounts/', include('allauth.urls')),# Gmail login (Google OAuth2 via allauth)
 
-    # path('auth/', include('dj_rest_auth.urls')), # Google auth
+    path('auth/', include('dj_rest_auth.urls')), # Google auth
     # path('auth/registration/', include('dj_rest_auth.registration.urls')),  # Google registration
     # path('auth/social/', include('allauth.socialaccount.urls')),  # Google Login
     # path('users/', include('users.urls'))

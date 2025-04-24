@@ -32,7 +32,7 @@ ALLOWED_HOSTS = []
 
 # Google Auto Verification
 
-SITE_ID = 1
+SITE_ID = 2
 
 REST_USE_JWT = True
 # TOKEN_MODEL = None
@@ -220,8 +220,18 @@ SOCIALACCOUNT_PROVIDERS = {
 # DEFAULT_FROM_EMAIL = config("DEFAULT_FROM_EMAIL")
 
 
+#FOR SENDING VERIFICATION AND OTHER EMAILS
 DEFAULT_FROM_EMAIL = config("DEFAULT_FROM_EMAIL")
 EMAIL_BACKEND = "sendgrid_backend.SendgridBackend"
 SENDGRID_SANDBOX_MODE_IN_DEBUG = False
 SENDGRID_API_KEY = config("SENDGRID_API_KEY")
 
+
+# FOR GOOGLE LOGIN
+AUTHENTICATION_BACKENDS = (
+    "django.contrib.auth.backends.ModelBackend",
+    "allauth.account.auth_backends.AuthenticationBackend"
+)
+
+LOGIN_REDIRECT_URL = '/'
+LOGOUT_REDIRECT_URL = '/'
