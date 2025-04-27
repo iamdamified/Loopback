@@ -36,9 +36,9 @@ class Skill(models.Model):
 class Profile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     bio = models.TextField(blank=True, null=True)
-    interests = models.ManyToManyField(Interest, max_length=255, blank=True, null=True)
-    goals = models.ManyToManyField(Skill, max_length=255, blank=True, null=True)
-    skills = models.CharField(max_length=255, blank=True, null=True)
+    interests = models.ManyToManyField(Interest, max_length=255, blank=True)
+    goals = models.CharField(max_length=255, blank=True, null=True)
+    skills = models.ManyToManyField(Skill, max_length=255, blank=True)
     experience = models.IntegerField(default=0)
 
     def __str__(self):
