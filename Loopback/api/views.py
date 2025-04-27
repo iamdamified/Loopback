@@ -53,9 +53,11 @@ class RegisterView(APIView):
         username = request.data['username']
         email = request.data['email']
         password = request.data['password']
+        first_name = request.data['first_name']
+        last_name = request.data['last_name']
         role = request.data.get('role', 'mentee')
 
-        user = User.objects.create_user(username=username, email=email, password=password, role=role)
+        user = User.objects.create_user(username=username, email=email, password=password, first_name=first_name, last_name=last_name, role=role)
         user.is_active = False  # Block login until verification
         user.save()
 

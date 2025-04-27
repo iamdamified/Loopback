@@ -1,6 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser
 from django.conf import settings
+# from api.models import *
 
 # Create your models here.
 
@@ -18,16 +19,33 @@ class User(AbstractUser):
     
 
 
+
+
+class Interest(models.Model):
+    name = models.CharField(max_length=100)
+
+    def __str__(self):
+        return self.name
+
+class Skill(models.Model):
+    name = models.CharField(max_length=100)
+
+    def __str__(self):
+        return self.name
+
 class Profile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     bio = models.TextField(blank=True, null=True)
-    interests = models.CharField(max_length=255, blank=True, null=True)
-    goals = models.CharField(max_length=255, blank=True, null=True)
+    interests = models.ManyToManyField(Interest, max_length=255, blank=True, null=True)
+    goals = models.ManyToManyField(Skill, max_length=255, blank=True, null=True)
     skills = models.CharField(max_length=255, blank=True, null=True)
     experience = models.IntegerField(default=0)
 
     def __str__(self):
         return f"{self.user.username}'s Profile"
+
+
+
 
 
 # LOOP INFORMATION FOR ORGANISATION

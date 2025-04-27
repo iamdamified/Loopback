@@ -6,24 +6,23 @@ from rest_framework.routers import DefaultRouter
 from .views import GoogleLogin
 
 router = DefaultRouter()
-router.register(r'loops', MentorshipViewSet, basename='')
-router.register(r'goals', GoalViewSet)
-router.register(r'checkins', WeeklycheckinViewSet)
-router.register(r'loop-feedbacks', LoopFeedbackViewSet)
+router.register(r'loops', MentorshipViewSet, basename='loops')
+router.register(r'goals', GoalViewSet, basename='goals')
+router.register('checkins/', WeeklycheckinViewSet, basename='checkins')
+router.register('loop-feedbacks/', LoopFeedbackViewSet, basename='loop-feedbacks')
 
 urlpatterns = router.urls
 
 urlpatterns = [
     path('register/', RegisterView.as_view(), name='register'),
     path('verify-email/<int:uid>/<str:token>/', VerifyEmailView.as_view(), name='verify-email'),
-    path('login/', LoginView.as_view(), name='login'),
     path('token/', CustomTokenView.as_view(), name='token_obtain_pair'),
     path('token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
     path('profile/', ProfileUserView.as_view(), name='profile'),
+    path('login/', LoginView.as_view(), name='login'),
 
     # Google login
     path('google/', GoogleLogin.as_view(), name='google_login'),
-
     
 
     
