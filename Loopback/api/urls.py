@@ -1,6 +1,6 @@
-from django.urls import path
+from django.urls import path, include
 # from rest_framework.authtoken.views import obtain_auth_token
-from .views import CustomTokenView, RegisterView, VerifyEmailView, ProfileUserView, LoginView, MentorshipViewSet, GoalViewSet, WeeklycheckinViewSet,  LoopFeedbackViewSet
+from .views import CustomTokenView, RegisterView, VerifyEmailView, ProfileUserView, InterestViewSet, SkillViewSet, LoginView, MentorshipViewSet, GoalViewSet, WeeklycheckinViewSet,  LoopFeedbackViewSet
 from rest_framework_simplejwt.views import TokenRefreshView
 from rest_framework.routers import DefaultRouter
 from .views import GoogleLogin
@@ -10,6 +10,10 @@ router.register(r'loops', MentorshipViewSet, basename='loops')
 router.register(r'goals', GoalViewSet, basename='goals')
 router.register('checkins/', WeeklycheckinViewSet, basename='checkins')
 router.register('loop-feedbacks/', LoopFeedbackViewSet, basename='loop-feedbacks')
+
+# FOR BACKEND DYNAMIC MATCHING INPUT DATA
+router.register(r'interests', InterestViewSet)
+router.register(r'skills', SkillViewSet)
 
 urlpatterns = router.urls
 
@@ -23,7 +27,10 @@ urlpatterns = [
 
     # Google login
     path('google/', GoogleLogin.as_view(), name='google_login'),
+    # FOR BACKEND
+    path('', include(router.urls)),
     
 
     
 ]
+

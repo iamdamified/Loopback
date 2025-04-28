@@ -19,31 +19,29 @@ class User(AbstractUser):
     
 
 
-
-
-class Interest(models.Model):
-    name = models.CharField(max_length=100)
-
-    def __str__(self):
-        return self.name
-
-class Skill(models.Model):
-    name = models.CharField(max_length=100)
-
-    def __str__(self):
-        return self.name
-
 class Profile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     bio = models.TextField(blank=True, null=True)
-    interests = models.ManyToManyField(Interest, max_length=255, blank=True)
+    interests = models.ManyToManyField('Interest')
     goals = models.CharField(max_length=255, blank=True, null=True)
-    skills = models.ManyToManyField(Skill, max_length=255, blank=True)
+    skills = models.ManyToManyField('Skill')
     experience = models.IntegerField(default=0)
 
     def __str__(self):
         return f"{self.user.username}'s Profile"
 
+
+class Interest(models.Model):
+    name = models.CharField(max_length=100)
+
+    # def __str__(self):
+    #     return self.name
+
+class Skill(models.Model):
+    name = models.CharField(max_length=100)
+
+    # def __str__(self):
+    #     return self.name
 
 
 

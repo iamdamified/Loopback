@@ -1,6 +1,6 @@
 from django.shortcuts import render
-from users.models import Profile, Mentorship, Goal, Weeklycheckin, LoopFeedback
-from .serializers import UserSerializer, ProfileSerializer, CustomTokenObtainPairSerializer, GoalSerializer, MentorshipSerializer, WeeklycheckinSerializer, LoopFeedbackSerializer
+from users.models import Profile, Interest, Skill, Mentorship, Goal, Weeklycheckin, LoopFeedback
+from .serializers import UserSerializer, ProfileSerializer, InterestSerializer, SkillSerializer, CustomTokenObtainPairSerializer, GoalSerializer, MentorshipSerializer, WeeklycheckinSerializer, LoopFeedbackSerializer
 from rest_framework.generics import ListCreateAPIView, RetrieveUpdateAPIView
 from rest_framework.views import APIView
 from rest_framework.decorators import api_view
@@ -129,6 +129,17 @@ class ProfileUserView(RetrieveUpdateAPIView):
 
     def get_object(self):
         return self.request.user.profile
+
+
+
+# Backend Dynamic Use Only.
+class InterestViewSet(viewsets.ModelViewSet):
+    queryset = Interest.objects.all()
+    serializer_class = InterestSerializer
+
+class SkillViewSet(viewsets.ModelViewSet):
+    queryset = Skill.objects.all()
+    serializer_class = SkillSerializer
 
 
 

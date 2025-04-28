@@ -22,3 +22,12 @@ app.autodiscover_tasks()
 #         'schedule': crontab(minute=0, hour=9, day_of_week='sunday'),  # Every SUNDAY 9AM
 #     },
 # }
+
+
+
+# app.conf.beat_schedule.update({
+#     'run-auto-matching-every-day': {
+#         'task': 'mentorship.tasks.run_auto_matching',
+#         'schedule': crontab(minute=0, hour=1),  # Every day at 1AM
+#     },
+# })

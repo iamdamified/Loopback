@@ -4,6 +4,7 @@ from django.conf import settings
 from django.utils import timezone
 from users.models import Mentorship, User
 from django.contrib.auth import get_user_model
+from .matching import match_pending_mentees
 
 
 User = get_user_model()
@@ -33,3 +34,9 @@ def loop_feedback_reminder():
         send_mail(subject, message, 'no-reply@lookback.com', [loop.mentor.email, loop.mentee.email], fail_silently=False)
 
 
+
+
+
+@shared_task
+def run_auto_matching():
+    match_pending_mentees()

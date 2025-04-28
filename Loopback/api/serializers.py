@@ -1,4 +1,4 @@
-from users.models import User, Profile, Mentorship, Goal, Weeklycheckin, LoopFeedback
+from users.models import User, Profile, Interest, Skill, Mentorship, Goal, Weeklycheckin, LoopFeedback
 from rest_framework import serializers
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 
@@ -19,6 +19,18 @@ class ProfileSerializer(serializers.ModelSerializer):
         model = Profile
         fields = ['user', 'bio', 'interests', 'goals', 'skills', 'experience']
 
+
+
+# For Backend Dynamic input Only.
+class InterestSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Interest
+        fields = ['id', 'name']
+
+class SkillSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Skill
+        fields = ['id', 'name']
 
 
 # AUTHENTICATION SERIALIZER FOR API
