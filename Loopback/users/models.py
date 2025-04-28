@@ -30,18 +30,28 @@ class Profile(models.Model):
     def __str__(self):
         return f"{self.user.username}'s Profile"
 
+#HOW TO CREATE PROFILE IN API
+# {
+#   "username": "mentor",
+#   "bio": "I want to guide juniors in Data Science.",
+#   "goals": "I want to guide juniors in Data Science.",
+#   "experience": "2",
+#   "interests": [1, 3],
+#   "skills": [2, 4]
+# }
+
 
 class Interest(models.Model):
     name = models.CharField(max_length=100)
 
-    # def __str__(self):
-    #     return self.name
+    def __str__(self):
+        return self.name
 
 class Skill(models.Model):
     name = models.CharField(max_length=100)
 
-    # def __str__(self):
-    #     return self.name
+    def __str__(self):
+        return self.name
 
 
 

@@ -1,11 +1,12 @@
-from django.shortcuts import render
-from users.models import Profile, Interest, Skill, Mentorship, Goal, Weeklycheckin, LoopFeedback
+from django.shortcuts import render, redirect
+from users.models import User, Profile, Interest, Skill, Mentorship, Goal, Weeklycheckin, LoopFeedback
 from .serializers import UserSerializer, ProfileSerializer, InterestSerializer, SkillSerializer, CustomTokenObtainPairSerializer, GoalSerializer, MentorshipSerializer, WeeklycheckinSerializer, LoopFeedbackSerializer
 from rest_framework.generics import ListCreateAPIView, RetrieveUpdateAPIView
 from rest_framework.views import APIView
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework import permissions, status, viewsets
+from rest_framework.exceptions import AuthenticationFailed
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.pagination import PageNumberPagination
 from rest_framework_simplejwt.tokens import RefreshToken
@@ -15,17 +16,54 @@ from django.contrib.auth.tokens import default_token_generator
 from django.core.mail import send_mail
 from django.urls import reverse
 from django.conf import settings
+from django.contrib.auth.decorators import login_required
 
 from allauth.socialaccount.providers.google.views import GoogleOAuth2Adapter
 from dj_rest_auth.registration.views import SocialLoginView
+
+
+
+@login_required
+def complete_role(request):
+    if request.method == 'POST':
+        role = request.POST.get('role')
+        if role:
+            request.user.role = role
+            request.user.save()
+            return redirect('home')  # Or dashboard page
+    return render(request, 'complete_roles.html')
+
 
 # Social login view
 class GoogleLogin(SocialLoginView):
     adapter_class = GoogleOAuth2Adapter
 
+    def post(self, request, *args, **kwargs):
+        response = super().post(request, *args, **kwargs)
+
+        user = request.user
+        if user.is_authenticated and not user.role:
+            return redirect('complete_role')
+
+        return response
+
+
+
+# class CustomTokenView(TokenObtainPairView):
+#     serializer_class = CustomTokenObtainPairSerializer
+
 
 class CustomTokenView(TokenObtainPairView):
     serializer_class = CustomTokenObtainPairSerializer
+
+    def post(self, request, *args, **kwargs):
+        response = super().post(request, *args, **kwargs)
+        user = self.user  # Make sure to access authenticated user
+
+        if user and not user.role:
+            raise AuthenticationFailed('Please complete your profile by selecting a role.')
+
+        return response
 
 
 # Create your views here.
@@ -91,6 +129,7 @@ class VerifyEmailView(APIView):
 
         return Response({'error': 'Invalid or expired token'}, status=400)
 
+
 class LoginView(APIView):
     def post(self, request):
         from django.contrib.auth import authenticate
@@ -99,6 +138,9 @@ class LoginView(APIView):
         user = authenticate(username=username, password=password)
 
         if user:
+            if not user.role:
+                return Response({"error": "Please complete your profile by selecting a role."}, status=status.HTTP_403_FORBIDDEN)
+
             refresh = RefreshToken.for_user(user)
             return Response(
                 {"refresh": str(refresh), "access": str(refresh.access_token)},

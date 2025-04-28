@@ -1,0 +1,31 @@
+
+FOR CELERY TASKS TO WORK
+1. run the django project
+2. start and run the task broker RABBIT OR REDIS
+3. start another terminal in VSCODE and run the CELERY program to run the tasks.
+
+
+Manual Option 2 for running tasks: Dynamic via Django Admin
+If you're using django-celery-beat, you can:
+
+Start server
+
+Visit /admin/django_celery_beat/periodictask/
+
+Add two PeriodicTask objects:
+
+One for send_weekly_checkin_reminders
+
+One for send_post_loop_feedback_reminders
+
+
+FINALLY- RUN CELERY + BEAT
+HEROKU REDIS will be configured in Heroku account. Then Redis is configured for Django project
+Start Redis (or RabbitMQ), then run:
+celery -A loopback worker --loglevel=info
+celery -A loopback beat --loglevel=info
+
+
+
+Zander of very academy tutorial run instruction:
+celery -A loopback worker -l info --pool=solo

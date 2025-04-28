@@ -12,12 +12,56 @@ class UserSerializer(serializers.ModelSerializer):
         fields = ['id', 'username', 'email', 'role', 'first_name', 'last_name', 'verified']
 
 
+# class ProfileSerializer(serializers.ModelSerializer):
+#     user = UserSerializer(read_only=True)
+
+#     class Meta:
+#         model = Profile
+#         fields = ['user', 'bio', 'interests', 'goals', 'skills', 'experience']
+
+
+
 class ProfileSerializer(serializers.ModelSerializer):
-    user = UserSerializer(read_only=True)
+    interests = serializers.PrimaryKeyRelatedField(
+        many=True,
+        queryset=Interest.objects.all()
+    )
+    skills = serializers.PrimaryKeyRelatedField(
+        many=True,
+        queryset=Skill.objects.all()
+    )
 
     class Meta:
         model = Profile
-        fields = ['user', 'bio', 'interests', 'goals', 'skills', 'experience']
+        fields = [
+            'id', 'user', 'role', 'goals', 'interests', 'skills',
+        ]
+        read_only_fields = ['user']
+
+    def create(self, validated_data):
+        interests = validated_data.pop('interests', [])
+        skills = validated_data.pop('skills', [])
+        profile = Profile.objects.create(**validated_data)
+
+        profile.interests.set(interests)
+        profile.skills.set(skills)
+        return profile
+
+    def update(self, instance, validated_data):
+        interests = validated_data.pop('interests', None)
+        skills = validated_data.pop('skills', None)
+
+        for attr, value in validated_data.items():
+            setattr(instance, attr, value)
+
+        if interests is not None:
+            instance.interests.set(interests)
+
+        if skills is not None:
+            instance.skills.set(skills)
+
+        instance.save()
+        return instance
 
 
 

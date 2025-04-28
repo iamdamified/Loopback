@@ -3,7 +3,7 @@ from django.urls import path, include
 from .views import CustomTokenView, RegisterView, VerifyEmailView, ProfileUserView, InterestViewSet, SkillViewSet, LoginView, MentorshipViewSet, GoalViewSet, WeeklycheckinViewSet,  LoopFeedbackViewSet
 from rest_framework_simplejwt.views import TokenRefreshView
 from rest_framework.routers import DefaultRouter
-from .views import GoogleLogin
+from .views import GoogleLogin, complete_role
 
 router = DefaultRouter()
 router.register(r'loops', MentorshipViewSet, basename='loops')
@@ -27,6 +27,8 @@ urlpatterns = [
 
     # Google login
     path('google/', GoogleLogin.as_view(), name='google_login'),
+    path('complete_role/', complete_role.as_view(), name='complete_role'),
+
     # FOR BACKEND
     path('', include(router.urls)),
     
