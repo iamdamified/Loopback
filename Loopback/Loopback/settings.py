@@ -248,3 +248,23 @@ CELERY_TASK_SERIALIZER = 'json'
 
 # CELERY BEAT
 INSTALLED_APPS += ['django_celery_beat']
+
+
+
+from celery.schedules import crontab
+
+
+CELERY_BEAT_SCHEDULE = {
+    'weekly-checkin-reminder': {
+        'task': 'api.tasks.weekly_checkin_reminder',
+        'schedule': crontab(day_of_week='sunday', hour=9, minute=0),
+    },
+    'loop-feedback-reminder': {
+        'task': 'api.tasks.loop_feedback_reminder',
+        'schedule': crontab(hour=8, minute=0),
+    },
+    'run-auto-matching-every-day': {
+        'task': 'mentorship.tasks.run_auto_matching',
+        'schedule': crontab(minute=0, hour=1),
+    },
+}

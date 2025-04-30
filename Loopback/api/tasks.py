@@ -15,9 +15,19 @@ def weekly_checkin_reminder():
     loops = Mentorship.objects.filter(status='ongoing', start_date__lte=today, finish_date__gte=today)
 
     for loop in loops:
-        subject = "Weekly Check-in Reminder from Loopback for" + loop.id
-        message = f"Hello {loop.mentee.username} & {loop.mentor.username}, \n\n This is a reminder for your weekly check-in {(today - loop.start_date).days // 7 + 1}.\n Please complete your check-in for this week.\n\n Thank you!"
-        send_mail(subject, message, 'no-reply@lookback.com', [loop.mentor.email, loop.mentee.email], fail_silently=False)
+        week_number = ((today - loop.start_date).days // 7) + 1
+        # Only send on the start of each week
+        if (today - loop.start_date).days % 7 == 0:
+            subject = f"Weekly Check-in Reminder (Week {week_number}) - Loop {loop.id}"
+            message = (
+                f"Hello {loop.mentee.username} & {loop.mentor.username},\n\n"
+                f"This is your Week {week_number} check-in reminder.\n"
+                "Please remember to check in with each other.\n\n"
+                "Thanks,\nThe Loopback Team"
+            )
+            send_mail(subject, message, settings.DEFAULT_FROM_EMAIL, [loop.mentor.email, loop.mentee.email])
+
+
 
 
 @shared_task
@@ -29,14 +39,18 @@ def loop_feedback_reminder():
         loop.status = 'completed'
         loop.save()
 
-        subject = "Loopback Feedback Reminder for Completed Loop" + loop.id
-        message = "Hello " + loop.mentee.username + " & " + loop.mentor.username + ", \n\n Your mentorship loop has been completed. Please provide your feedback on Loopback.\n\n Thank you!"
-        send_mail(subject, message, 'no-reply@lookback.com', [loop.mentor.email, loop.mentee.email], fail_silently=False)
-
-
+        subject = f"Loopback Feedback Reminder - Loop {loop.id}"
+        message = (
+            f"Hi {loop.mentee.username} & {loop.mentor.username},\n\n"
+            "Your mentorship loop has ended. We'd love your feedback to help us improve!\n"
+            "Please log in to provide your feedback.\n\n"
+            "Thanks,\nThe Loopback Team"
+        )
+        send_mail(subject, message, settings.DEFAULT_FROM_EMAIL, [loop.mentor.email, loop.mentee.email])
 
 
 
 @shared_task
 def run_auto_matching():
     match_pending_mentees()
+

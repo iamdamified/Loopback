@@ -21,7 +21,10 @@ One for send_post_loop_feedback_reminders
 
 FINALLY- RUN CELERY + BEAT
 HEROKU REDIS will be configured in Heroku account. Then Redis is configured for Django project
-Start Redis (or RabbitMQ), then run:
+Start Redis server(or RabbitMQ): 
+redis-server
+
+then run worker and beat:
 celery -A loopback worker --loglevel=info
 celery -A loopback beat --loglevel=info
 
