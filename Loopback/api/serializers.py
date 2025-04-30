@@ -1,8 +1,6 @@
-from users.models import User, Profile, Interest, Skill, Mentorship, Goal, Weeklycheckin, LoopFeedback
+from users.models import User, Profile, Interest, Skill, MatchRequest, Mentorship, Goal, Weeklycheckin, LoopFeedback
 from rest_framework import serializers
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
-
-
 
 
 # USERS INFORMATION SERIALIZERS
@@ -11,6 +9,17 @@ class UserSerializer(serializers.ModelSerializer):
         model = User
         fields = ['id', 'username', 'email', 'role', 'first_name', 'last_name', 'verified']
 
+
+
+# AUTHENTICATION SERIALIZER FOR API
+class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
+    def validate(self, attrs):
+        data = super().validate(attrs)
+        if not self.user.verified:
+            raise serializers.ValidationError('Please verify your email before logging in.')
+        data['user_id'] = self.user.id
+        data['role'] = self.user.role
+        return data
 
 # class ProfileSerializer(serializers.ModelSerializer):
 #     user = UserSerializer(read_only=True)
@@ -64,7 +73,6 @@ class ProfileSerializer(serializers.ModelSerializer):
         return instance
 
 
-
 # For Backend Dynamic input Only.
 class InterestSerializer(serializers.ModelSerializer):
     class Meta:
@@ -77,26 +85,11 @@ class SkillSerializer(serializers.ModelSerializer):
         fields = ['id', 'name']
 
 
-# AUTHENTICATION SERIALIZER FOR API
-class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
-    def validate(self, attrs):
-        data = super().validate(attrs)
-        if not self.user.verified:
-            raise serializers.ValidationError('Please verify your email before logging in.')
-        data['user_id'] = self.user.id
-        data['role'] = self.user.role
-        return data
-
-
-# class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
-#     def validate(self, attrs):
-#         data = super().validate(attrs)
-        
-#         data['role'] = self.user.role
-#         return data
-
-
-
+# Match Rrequest to Matched Mentor
+class MatchRequestSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = MatchRequest
+        fields = ['id', 'mentor', 'mentee', 'created_at', 'is_approved', 'responded']
 
 
 # LOOP SERIALIZERS
@@ -115,6 +108,17 @@ class MentorshipSerializer(serializers.ModelSerializer):
         model = Mentorship
         fields = '__all__'
         read_only_fields = ['status']
+
+
+
+
+
+
+
+
+
+
+
 
 
 

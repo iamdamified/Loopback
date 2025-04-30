@@ -1,9 +1,9 @@
 from django.shortcuts import render, redirect
-from users.models import User, Profile, Interest, Skill, Mentorship, Goal, Weeklycheckin, LoopFeedback
-from .serializers import UserSerializer, ProfileSerializer, InterestSerializer, SkillSerializer, CustomTokenObtainPairSerializer, GoalSerializer, MentorshipSerializer, WeeklycheckinSerializer, LoopFeedbackSerializer
-from rest_framework.generics import ListCreateAPIView, RetrieveUpdateAPIView
+from users.models import User, Profile, Interest, Skill, MatchRequest, Mentorship, Goal, Weeklycheckin, LoopFeedback
+from .serializers import UserSerializer, ProfileSerializer, MatchRequestSerializer, InterestSerializer, SkillSerializer, CustomTokenObtainPairSerializer, GoalSerializer, MentorshipSerializer, WeeklycheckinSerializer, LoopFeedbackSerializer
+from rest_framework.generics import CreateAPIView,ListCreateAPIView, RetrieveUpdateAPIView, ListAPIView
 from rest_framework.views import APIView
-from rest_framework.decorators import api_view
+from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework import permissions, status, viewsets
 from rest_framework.exceptions import AuthenticationFailed
@@ -21,6 +21,10 @@ from django.contrib.auth.decorators import login_required
 from allauth.socialaccount.providers.google.views import GoogleOAuth2Adapter
 from dj_rest_auth.registration.views import SocialLoginView
 
+from .matching import search_mentor_for_mentee
+
+from django.utils.http import urlsafe_base64_decode
+from django.contrib.auth.hashers import make_password
 
 
 @login_required
@@ -52,21 +56,6 @@ class GoogleLogin(SocialLoginView):
 # class CustomTokenView(TokenObtainPairView):
 #     serializer_class = CustomTokenObtainPairSerializer
 
-
-class CustomTokenView(TokenObtainPairView):
-    serializer_class = CustomTokenObtainPairSerializer
-
-    def post(self, request, *args, **kwargs):
-        response = super().post(request, *args, **kwargs)
-        user = self.user  # Make sure to access authenticated user
-
-        if user and not user.role:
-            raise AuthenticationFailed('Please complete your profile by selecting a role.')
-
-        return response
-
-
-# Create your views here.
 
 User = get_user_model()
 
@@ -113,7 +102,7 @@ class RegisterView(APIView):
 
         return Response({'message': 'Registration successful! Check your email to verify your account.'}, status=201)
 
-
+# Verification of Email
 class VerifyEmailView(APIView):
     def get(self, request, uid, token):
         try:
@@ -128,6 +117,20 @@ class VerifyEmailView(APIView):
             return Response({'message': 'Email verified! You can now log in.'}, status=200)
 
         return Response({'error': 'Invalid or expired token'}, status=400)
+    
+
+# LOG IN
+class CustomTokenView(TokenObtainPairView):
+    serializer_class = CustomTokenObtainPairSerializer
+
+    def post(self, request, *args, **kwargs):
+        response = super().post(request, *args, **kwargs)
+        user = self.user  # Make sure to access authenticated user
+
+        if user and not user.role:
+            raise AuthenticationFailed('Please complete your profile by selecting a role.')
+
+        return response
 
 
 class LoginView(APIView):
@@ -150,38 +153,133 @@ class LoginView(APIView):
 
 
 
-# Profile Creation and Operations
-class ProfileUserCreate(ListCreateAPIView):
-    queryset = Profile.objects.all()
+class PasswordResetRequestView(APIView):
+    def post(self, request):
+        email = request.data.get('email')
+        user = User.objects.filter(email=email).first()
+        if user:
+            from django.utils.http import urlsafe_base64_encode
+            from django.utils.encoding import force_bytes
+
+            uid = urlsafe_base64_encode(force_bytes(user.pk))
+            token = default_token_generator.make_token(user)
+            reset_url = f"https://your-frontend.com/reset-password?uid={uid}&token={token}"
+
+            send_mail(
+                subject='Password Reset on Loopback',
+                message=f'Click here to reset your password: {reset_url}',
+                from_email='no-reply@loopback.com',
+                recipient_list=[email],
+            )
+
+        return Response({"message": "A reset link will be sent to your email if it exists."}, status=200)
+
+
+
+class PasswordResetConfirmView(APIView):
+    def post(self, request):
+        uidb64 = request.data.get('uid')
+        token = request.data.get('token')
+        new_password = request.data.get('new_password')
+
+        try:
+            uid = urlsafe_base64_decode(uidb64).decode()
+            user = User.objects.get(pk=uid)
+        except (TypeError, ValueError, OverflowError, User.DoesNotExist):
+            return Response({'error': 'Invalid user'}, status=400)
+
+        if not default_token_generator.check_token(user, token):
+            return Response({'error': 'Invalid or expired token'}, status=400)
+
+        user.password = make_password(new_password)
+        user.save()
+        return Response({'message': 'Password reset successful'})
+
+
+
+# Users Profile Creation
+# class CreateUserProfileView(CreateAPIView):
+#     serializer_class = ProfileSerializer
+#     permission_classes = [IsAuthenticated]
+
+#     def perform_create(self, serializer):
+#         profile = serializer.save(user=self.request.user)
+
+#         if profile.role == 'mentee':
+#             matched_mentor = search_mentor_for_mentee(profile)
+#             if matched_mentor:
+#                 Mentorship.objects.create(
+#                     mentor=matched_mentor,
+#                     mentee=profile,
+#                     is_active=True,
+#                 )
+    
+
+# Users Profile Retrieval and Update
+
+
+
+class ProfileUserUpdateView(RetrieveUpdateAPIView):
     serializer_class = ProfileSerializer
     permission_classes = [IsAuthenticated]
-    pagination_class = PageNumberPagination
-    # lookup_field = "id"
 
     def get_object(self):
         return self.request.user.profile
     
+    def perform_update(self, serializer):
+        profile = serializer.save()
 
-class ProfileUserView(RetrieveUpdateAPIView):
-    queryset = Profile.objects.all()
-    serializer_class = ProfileSerializer
-    permission_classes = [IsAuthenticated]
-    pagination_class = PageNumberPagination
-    lookup_field = "id"
+        # Only run matching logic if profile is being updated to mentee (you can refine this)
+        if profile.role == 'mentee' and not Mentorship.objects.filter(mentee=profile).exists():
+            matched_mentor = search_mentor_for_mentee(profile)
+            if matched_mentor:
+                # MatchRequest.objects.get_or_create OR Mentorship.objects.create
+                MatchRequest.objects.get_or_create(
+                    mentor=matched_mentor,
+                    mentee=profile,
+                    is_active=True,
+                )
+        return Response({'message': 'MatchRequest created: mentee {profile.user.username} → mentor {matched_mentor.user.username}'}, status=201)
+        # return Response(f"MatchRequest created: mentee {profile.user.username} → mentor {matched_mentor.user.username}")
+    
 
-    def get_object(self):
-        return self.request.user.profile
 
 
 
-# Backend Dynamic Use Only.
-class InterestViewSet(viewsets.ModelViewSet):
-    queryset = Interest.objects.all()
-    serializer_class = InterestSerializer
+class MatchRequestViewSet(viewsets.ModelViewSet):
+    queryset = MatchRequest.objects.all()
+    serializer_class = MatchRequestSerializer
 
-class SkillViewSet(viewsets.ModelViewSet):
-    queryset = Skill.objects.all()
-    serializer_class = SkillSerializer
+    @action(detail=True, methods=['post'])
+    def approve(self, request, pk=None):
+        match_request = self.get_object()
+        if match_request.mentor.user != request.user:
+            return Response({'error': 'Not authorized.'}, status=403)
+
+        match_request.is_approved = True
+        match_request.responded = True
+        match_request.save()
+
+        Mentorship.objects.create(
+            mentor=match_request.mentor,
+            mentee=match_request.mentee,
+            is_active=True,
+        )
+
+        return Response({'status': 'Match approved and mentorship loop started.'})
+
+    @action(detail=True, methods=['post'])
+    def reject(self, request, pk=None):
+        match_request = self.get_object()
+        if match_request.mentor.user != request.user:
+            return Response({'error': 'Not authorized.'}, status=403)
+
+        match_request.responded = True
+        match_request.save()
+
+        return Response({'status': 'Match not accepted, please, view suggestions and update your profile'})
+    
+
 
 
 
@@ -229,8 +327,6 @@ class LoopFeedbackViewSet(viewsets.ModelViewSet):
     serializer_class = LoopFeedbackSerializer
     permission_classes = [IsAuthenticated]
     
-    
-
     def perform_create(self, serializer):
         serializer.save(created_by=self.request.user)
 
@@ -241,6 +337,31 @@ class LoopFeedbackViewSet(viewsets.ModelViewSet):
 
 
 
+# Backend Profile Creation and Operations
+class ProfileUserCreate(ListCreateAPIView):
+    queryset = Profile.objects.all()
+    serializer_class = ProfileSerializer
+    permission_classes = [IsAuthenticated]
+    pagination_class = PageNumberPagination
+    lookup_field = "id"
 
+class ProfileUserUpdate(RetrieveUpdateAPIView):
+    queryset = Profile.objects.all()
+    serializer_class = ProfileSerializer
+    permission_classes = [IsAuthenticated]
+    pagination_class = PageNumberPagination
+    lookup_field = "id"
+
+
+
+
+# Backend Dynamic Use for Matching Only.
+class InterestViewSet(viewsets.ModelViewSet):
+    queryset = Interest.objects.all()
+    serializer_class = InterestSerializer
+
+class SkillViewSet(viewsets.ModelViewSet):
+    queryset = Skill.objects.all()
+    serializer_class = SkillSerializer
     
 

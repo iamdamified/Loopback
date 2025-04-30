@@ -58,6 +58,20 @@ class Skill(models.Model):
 
 # LOOP INFORMATION FOR ORGANISATION
 # This is a mentorship loop between a mentor and a mentee.
+
+class MatchRequest(models.Model):
+    mentor = models.ForeignKey(Profile, related_name='incoming_requests', on_delete=models.CASCADE)
+    mentee = models.ForeignKey(Profile, related_name='outgoing_requests', on_delete=models.CASCADE)
+    created_at = models.DateTimeField(auto_now_add=True)
+    is_approved = models.BooleanField(default=False)
+    responded = models.BooleanField(default=False)
+
+    class Meta:
+        unique_together = ('mentor', 'mentee')
+
+
+
+        
 class Mentorship(models.Model):
     STATUS_CHOICES = (
         ('waiting', 'Waiting'),
@@ -65,12 +79,15 @@ class Mentorship(models.Model):
         ('completed', 'Completed'),
     )
 
-    mentor = models.ForeignKey(settings.AUTH_USER_MODEL, related_name= 'mentor', on_delete=models.CASCADE)
-    mentee = models.ForeignKey(settings.AUTH_USER_MODEL, related_name= 'mentee', on_delete=models.CASCADE)
+    mentor = models.ForeignKey(Profile, related_name= 'mentor_loops', on_delete=models.CASCADE)
+    mentee = models.ForeignKey(Profile, related_name= 'mentee_loops', on_delete=models.CASCADE)
     start_date = models.DateField(auto_created=True)
     finish_date = models.DateField(auto_created=True)
     status = models.CharField(max_length=10, choices=STATUS_CHOICES, default='waiting')
     created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        unique_together = ('mentor', 'mentee') # Prevent duplicate loops
 
     def __str__(self):
         return self.mentor.username + ' - ' + self.mentee.username + ' - ' + self.status

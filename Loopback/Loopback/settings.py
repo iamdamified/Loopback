@@ -30,6 +30,8 @@ DEBUG = True
 ALLOWED_HOSTS = []
 
 
+
+
 # Google Auto Verification
 
 SITE_ID = 2
@@ -39,7 +41,7 @@ REST_USE_JWT = True
 
 ACCOUNT_AUTHENTICATION_METHOD = 'email'  # or 'username' or 'username_email' or 'email'
 ACCOUNT_EMAIL_REQUIRED = True
-# ACCOUNT_USERNAME_REQUIRED = False  # If you want email-only login
+# ACCOUNT_USERNAME_REQUIRED = False  # email-only login
 ACCOUNT_EMAIL_VERIFICATION = 'none' # 'mandatory' or 'none' or 'optional'
 SOCIALACCOUNT_QUERY_EMAIL = True
 
@@ -79,7 +81,7 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'allauth.account.middleware.AccountMiddleware',
-    'yourapp.middleware.RoleRequiredMiddleware',
+    'api.middleware.RoleRequiredMiddleware',
 ]
 
 ROOT_URLCONF = 'Loopback.urls'
