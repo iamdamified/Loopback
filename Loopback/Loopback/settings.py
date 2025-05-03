@@ -56,6 +56,9 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'users',
     'api',
+    'mentorship',
+    'weeklycheckin',
+    'feedback',
     'rest_framework',
     'rest_framework_simplejwt',
     'rest_framework.authtoken',
@@ -81,7 +84,7 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'allauth.account.middleware.AccountMiddleware',
-    'api.middleware.RoleRequiredMiddleware',
+    'Loopback.middleware.RoleRequiredMiddleware',
 ]
 
 ROOT_URLCONF = 'Loopback.urls'

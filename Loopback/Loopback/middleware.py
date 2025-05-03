@@ -19,7 +19,7 @@ class RoleRequiredMiddleware:
 
         if request.user.is_authenticated:
             if not request.user.role and not any(path.startswith(url) for url in EXEMPT_URLS):
-                return redirect(reverse('complete_role'))  #view  in urls.py
+                return redirect(reverse('complete_role'))  # view  in urls.py front frontend
         
         response = self.get_response(request)
         return response

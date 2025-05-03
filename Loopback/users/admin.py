@@ -1,6 +1,6 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
-from .models import User, Profile, Interest, Skill, Mentorship, Goal, Weeklycheckin, LoopFeedback
+from .models import User, Profile, Interest, Skill
 from django_celery_beat.models import PeriodicTasks
 
 
@@ -25,10 +25,4 @@ admin.site.register(Interest)
 
 admin.site.register(Skill)
 
-admin.site.register(Mentorship)
 
-admin.site.register(Goal)
-
-admin.site.register(Weeklycheckin)
-
-admin.site.register(LoopFeedback)

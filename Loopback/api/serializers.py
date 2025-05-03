@@ -1,4 +1,7 @@
-from users.models import User, Profile, Interest, Skill, MatchRequest, Mentorship, Goal, Weeklycheckin, LoopFeedback
+from users.models import User, Profile, Interest, Skill
+from mentorship.models import MatchRequest, Mentorship, Goal
+from weeklycheckin.models import Weeklycheckin
+from feedback.models import LoopFeedback
 from rest_framework import serializers
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 

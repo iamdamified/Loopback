@@ -1,4 +1,5 @@
-from users.models import Profile, Mentorship
+from users.models import Profile
+from mentorship.models import Mentorship
 from django.utils import timezone
 from django.db.models import Count
 

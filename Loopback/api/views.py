@@ -1,6 +1,10 @@
 from django.shortcuts import render, redirect
-from users.models import User, Profile, Interest, Skill, MatchRequest, Mentorship, Goal, Weeklycheckin, LoopFeedback
-from .serializers import UserSerializer, ProfileSerializer, MatchRequestSerializer, InterestSerializer, SkillSerializer, CustomTokenObtainPairSerializer, GoalSerializer, MentorshipSerializer, WeeklycheckinSerializer, LoopFeedbackSerializer
+from users.models import User, Profile, Interest, Skill
+from mentorship.models import MatchRequest, Mentorship, Goal
+from weeklycheckin.models import Weeklycheckin
+from feedback.models import LoopFeedback
+from .serializers import UserSerializer, ProfileSerializer, InterestSerializer, SkillSerializer, CustomTokenObtainPairSerializer, MatchRequestSerializer, GoalSerializer, MentorshipSerializer, WeeklycheckinSerializer, LoopFeedbackSerializer
+# from mentorship.serializers import MatchRequestSerializer, GoalSerializer, MentorshipSerializer
 from rest_framework.generics import CreateAPIView,ListCreateAPIView, RetrieveUpdateAPIView, ListAPIView
 from rest_framework.views import APIView
 from rest_framework.decorators import action
