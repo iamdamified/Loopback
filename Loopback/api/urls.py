@@ -1,7 +1,13 @@
 from django.urls import path, include
 # from rest_framework.authtoken.views import obtain_auth_token
-from .views import CustomTokenView, RegisterView, VerifyEmailView, ProfileUserUpdateView, MatchRequestViewSet, InterestViewSet, SkillViewSet, LoginView, MentorshipViewSet, GoalViewSet, WeeklycheckinViewSet,  LoopFeedbackViewSet
-from .views import GoogleLogin, complete_role, PasswordResetRequestView, PasswordResetConfirmView
+from users.views import CustomTokenView, RegisterView, VerifyEmailView, LoginView,  PasswordResetRequestView, PasswordResetConfirmView
+from matchrequest.views import MatchRequestViewSet
+from mentorship.views import MentorshipViewSet
+from goal.views import GoalViewSet
+from weeklycheckin.views import WeeklycheckinViewSet
+from feedback.views import LoopFeedbackViewSet
+from profiles.views import ProfileUserUpdateView, InterestViewSet, SkillViewSet
+from .views import GoogleLogin, complete_role
 from rest_framework_simplejwt.views import TokenRefreshView
 from rest_framework.routers import DefaultRouter
 

@@ -2,7 +2,8 @@ from celery import shared_task
 from django.core.mail import send_mail
 from django.conf import settings
 from django.utils import timezone
-from users.models import Mentorship, User
+from mentorship.models import Mentorship
+from users.models import User
 from django.contrib.auth import get_user_model
 from .matching import match_pending_mentees
 

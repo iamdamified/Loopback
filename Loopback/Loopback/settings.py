@@ -59,6 +59,9 @@ INSTALLED_APPS = [
     'mentorship',
     'weeklycheckin',
     'feedback',
+    'matchrequest',
+    'goal',
+    'profiles',
     'rest_framework',
     'rest_framework_simplejwt',
     'rest_framework.authtoken',
@@ -240,7 +243,7 @@ AUTHENTICATION_BACKENDS = (
 )
 
 LOGIN_REDIRECT_URL = '/'
-# LOGOUT_REDIRECT_URL = '/'
+LOGOUT_REDIRECT_URL = '/'
 
 
 # FOR CELERY
@@ -253,9 +256,8 @@ CELERY_TASK_SERIALIZER = 'json'
 INSTALLED_APPS += ['django_celery_beat']
 
 
-
+# TASKS SCHEDULE
 from celery.schedules import crontab
-
 
 CELERY_BEAT_SCHEDULE = {
     'weekly-checkin-reminder': {
