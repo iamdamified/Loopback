@@ -1,9 +1,12 @@
 from django.db import models
-from users.models import User
+# from users.models import User
+from django.contrib.auth import get_user_model
+
+User = get_user_model()
 
 # Create your models here.
 class Profile(models.Model):
-    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='profile')
     bio = models.TextField(blank=True, null=True)
     interests = models.ManyToManyField('Interest')
     goals = models.CharField(max_length=255, blank=True, null=True)

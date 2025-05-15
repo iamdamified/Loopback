@@ -6,6 +6,7 @@ from rest_framework import serializers
 
 
 class ProfileSerializer(serializers.ModelSerializer):
+    role = serializers.CharField(source='user.role', read_only=True)
     interests = serializers.PrimaryKeyRelatedField(
         many=True,
         queryset=Interest.objects.all()
@@ -18,7 +19,7 @@ class ProfileSerializer(serializers.ModelSerializer):
     class Meta:
         model = Profile
         fields = [
-            'id', 'user', 'role', 'goals', 'interests', 'skills',
+            'id', 'user', 'bio', 'goals', 'interests', 'skills', 'experience', 'role'
         ]
         read_only_fields = ['user']
 

@@ -3,11 +3,16 @@ from django.urls import reverse
 
 EXEMPT_URLS = [
     '/admin/',
-    '/auth/complete_role/', # api/auth/complete_role/
-    '/auth/login/',     # api/auth/login/
+    '/api/auth/complete_role/', # api/auth/complete_role/
+    '/api/auth/login/',     # api/auth/login/
     '/auth/google/',  # api/auth/google/ Google login endpoint
-    '/auth/token/',   # api/auth/token/ Token login endpoint
-    '/auth/token/refresh/', # api/auth/token/refresh/ Token refresh endpoint
+    '/api/auth/token/',   # Token login endpoint
+    '/api/auth/token/refresh/', # Token refresh endpoint
+    '/api/auth/register/', # Register endpoint
+    '/api/auth/verify-email/<int:uid>/<str:token>/', # Verify email endpoint
+    '/api/auth/forgot-password/', # Password reset request endpoint
+    '/api/auth/reset-password-confirm/', # Password reset confirm endpoint
+    '/api/auth/profile/' # Profile update endpoint
 ]
 
 class RoleRequiredMiddleware:

@@ -1,5 +1,3 @@
-from django.shortcuts import render
-from users.models import User
 from mentorship.models import Mentorship
 from matchrequest.models import MatchRequest
 from .models import Profile, Interest, Skill
@@ -26,7 +24,7 @@ class ProfileUserUpdateView(RetrieveUpdateAPIView):
         profile = serializer.save()
 
         # Only run matching logic if profile is being updated to mentee (you can refine this)
-        if profile.role == 'mentee' and not Mentorship.objects.filter(mentee=profile).exists():
+        if profile.user.role == 'mentee' and not Mentorship.objects.filter(mentee=profile).exists():
             matched_mentor = search_mentor_for_mentee(profile)
             if matched_mentor:
                 # MatchRequest.objects.get_or_create OR Mentorship.objects.create

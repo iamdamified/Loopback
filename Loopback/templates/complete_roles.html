@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Complete Your Role</title>
+</head>
+<body>
+    <h1>Please complete your profile by selecting a role</h1>
+    <form action="" method="POST">
+        {% csrf_token %}
+        <label for="role">Select Role:</label>
+        <select name="role" id="role">
+            <option value="mentor">Mentor</option>
+            <option value="mentee">Mentee</option>
+        </select>
+        <button type="submit">Submit</button>
+    </form>
+</body>
+</html>
