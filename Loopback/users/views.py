@@ -209,31 +209,39 @@ def complete_role(request):
 class PasswordResetRequestView(APIView):
     def post(self, request):
         email = request.data.get('email')
+
+        # ✅ Require email
+        if not email:
+            return Response(
+                {"error": "Email field is required."},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
         user = User.objects.filter(email=email).first()
         if user:
-            # from django.utils.http import urlsafe_base64_encode
-            # from django.utils.encoding import force_bytes
-
             uid = urlsafe_base64_encode(force_bytes(user.pk))
             token = default_token_generator.make_token(user)
             reset_url = f"http://localhost:8000/api/auth/reset-password-confirm/?uid={uid}&token={token}"
-            
+
             try:
                 send_mail(
                     subject='Password Reset on Loopback',
                     message=f'Click here to reset your password: {reset_url}',
-                    from_email='no-reply@loopback.com',
+                    from_email='adekoyadamilareofficial@gmail.com',  # Must be verified with SendGrid!
                     recipient_list=[email],
                 )
             except Exception as e:
+                print (e)
                 return Response(
                     {"error": "Failed to send reset email. Please try again later."},
                     status=status.HTTP_500_INTERNAL_SERVER_ERROR
                 )
 
-        return Response({"message": "A reset link will be sent to your email if it exists."}, status=200)
-
-
+        # Always return a generic message
+        return Response(
+            {"message": "A reset link will be sent to your email if it exists."},
+            status=status.HTTP_200_OK
+        )
 
 class PasswordResetConfirmView(APIView):
     def post(self, request):
