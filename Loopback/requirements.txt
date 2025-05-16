@@ -26,10 +26,12 @@ django-sendgrid-v5==1.2.4
 django-timezone-field==7.1
 djangorestframework==3.16.0
 djangorestframework_simplejwt==5.5.0
+ecdsa==0.19.1
 gunicorn==23.0.0
 idna==3.10
 kombu==5.5.3
 Markdown==3.8
+MarkupSafe==3.0.2
 oauthlib==3.2.2
 packaging==25.0
 pillow==11.2.1
@@ -46,8 +48,7 @@ python-http-client==3.3.7
 redis==5.2.1
 requests==2.32.3
 requests-oauthlib==2.0.0
-sendgrid==6.11.0
-sendgrid-django==4.2.0
+sendgrid==6.12.2
 six==1.17.0
 sqlparse==0.5.3
 starkbank-ecdsa==2.2.0
@@ -57,4 +58,5 @@ tzdata==2025.2
 urllib3==2.4.0
 vine==5.1.0
 wcwidth==0.2.13
+Werkzeug==2.3.8
 whitenoise==6.9.0
