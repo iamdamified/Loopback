@@ -27,7 +27,9 @@ SECRET_KEY = config("SECRET_KEY")
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['loopback-f6mg.onrender.com']
+ALLOWED_HOSTS = ['*']
+
+# ALLOWED_HOSTS = ['loopback-f6mg.onrender.com']
 
 
 
@@ -39,11 +41,18 @@ SITE_ID = 2
 REST_USE_JWT = True
 # TOKEN_MODEL = None
 
-ACCOUNT_AUTHENTICATION_METHOD = 'email'  # or 'username' or 'username_email' or 'email'
-ACCOUNT_EMAIL_REQUIRED = True
+ACCOUNT_USER_MODEL_USERNAME_FIELD = None
+# ACCOUNT_AUTHENTICATION_METHOD = 'email'  # or 'username' or 'username_email' or 'email'
+# ACCOUNT_EMAIL_REQUIRED = True
 # ACCOUNT_USERNAME_REQUIRED = False  # email-only login
 ACCOUNT_EMAIL_VERIFICATION = 'none' # 'mandatory' or 'none' or 'optional'
+
+
+ACCOUNT_SIGNUP_FIELDS = ['email*', 'password1*', 'password2*']
+ACCOUNT_LOGIN_METHODS = {'email'}
 SOCIALACCOUNT_QUERY_EMAIL = True
+
+
 
 # Application definition
 
@@ -60,12 +69,12 @@ INSTALLED_APPS = [
     'weeklycheckin',
     'feedback',
     'matchrequest',
-    'goal',
     'profiles',
     'rest_framework',
     'rest_framework_simplejwt',
     'rest_framework.authtoken',
     'rest_framework_simplejwt.token_blacklist',
+    'corsheaders',
 
 
     'django.contrib.sites',  # Required for allauth(Google auto login)
@@ -88,6 +97,8 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'allauth.account.middleware.AccountMiddleware',
     'Loopback.middleware.RoleRequiredMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
+    'django.middleware.common.CommonMiddleware',
 ]
 
 ROOT_URLCONF = 'Loopback.urls'
@@ -184,6 +195,10 @@ REST_FRAMEWORK = {
 }
 
 
+REST_AUTH_REGISTER_SERIALIZERS = {
+    'REGISTER_SERIALIZER': 'users.serializers.CustomRegisterSerializer',
+}
+
 from datetime import timedelta
 
 SIMPLE_JWT = {
@@ -242,8 +257,8 @@ AUTHENTICATION_BACKENDS = (
     "allauth.account.auth_backends.AuthenticationBackend"
 )
 
-LOGIN_REDIRECT_URL = '/'
-LOGOUT_REDIRECT_URL = '/'
+LOGIN_REDIRECT_URL = ''
+LOGOUT_REDIRECT_URL = ''
 
 
 # FOR CELERY
@@ -268,8 +283,8 @@ CELERY_BEAT_SCHEDULE = {
         'task': 'api.tasks.loop_feedback_reminder',
         'schedule': crontab(hour=8, minute=0),
     },
-    'run-auto-matching-every-day': {
-        'task': 'mentorship.tasks.run_auto_matching',
-        'schedule': crontab(minute=0, hour=1),
-    },
+    # 'run-auto-matching-every-day': {
+    #     'task': 'mentorship.tasks.run_auto_matching',
+    #     'schedule': crontab(minute=0, hour=1),
+    # },
 }

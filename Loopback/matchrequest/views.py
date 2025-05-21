@@ -1,44 +1,85 @@
-from django.shortcuts import render
-from .models import MatchRequest
-from .serializers import MatchRequestSerializer
-from rest_framework.decorators import action
+from rest_framework.views import APIView
 from rest_framework.response import Response
-from rest_framework import viewsets
-from mentorship.models import Mentorship
+from rest_framework.permissions import IsAuthenticated
+from django.shortcuts import get_object_or_404
+from profiles.models import MenteeProfile, MentorProfile
+from matchrequest.models import MatchRequest
+from django.core.mail import send_mail
+from django.contrib.auth import get_user_model
+from django.conf import settings
+from mentorship.models import MentorshipLoop
+from datetime import timedelta
+from django.utils import timezone
 
-# Create your views here.
 
-class MatchRequestViewSet(viewsets.ModelViewSet):
-    queryset = MatchRequest.objects.all()
-    serializer_class = MatchRequestSerializer
 
-    @action(detail=True, methods=['post'])
-    def approve(self, request, pk=None):
-        match_request = self.get_object()
-        if match_request.mentor.user != request.user:
-            return Response({'error': 'Not authorized.'}, status=403)
+User = get_user_model()
 
-        match_request.is_approved = True
-        match_request.responded = True
-        match_request.save()
+class MatchRequestView(APIView):
+    permission_classes = [IsAuthenticated]
 
-        Mentorship.objects.create(
-            mentor=match_request.mentor,
-            mentee=match_request.mentee,
-            is_active=True,
+    def post(self, request):
+        mentee = MenteeProfile.objects.get(user=request.user)
+        mentor_id = request.data.get("mentor_id")
+        mentor = get_object_or_404(MentorProfile, id=mentor_id)
+
+        match_request, created = MatchRequest.objects.get_or_create(
+            mentor=mentor, mentee=mentee
         )
+        if not created:
+            return Response({"detail": "Match request already sent."}, status=400)
 
-        return Response({'status': 'Match approved and mentorship loop started.'})
+        # Send email to mentor
+        send_mail(
+                subject="New Mentorship Match Request",
+                message=f"{mentee.first_name} {mentee.last_name} has requested to start a mentorship loop with you on LoopBack. Please login to accept or decline.",
+                from_email=settings.DEFAULT_FROM_EMAIL,
+                recipient_list=[mentor.user.email]
+            )
 
-    @action(detail=True, methods=['post'])
-    def reject(self, request, pk=None):
-        match_request = self.get_object()
-        if match_request.mentor.user != request.user:
-            return Response({'error': 'Not authorized.'}, status=403)
-
-        match_request.responded = True
-        match_request.save()
-
-        return Response({'status': 'Match not accepted, please, view suggestions and update your profile'})
+        return Response({"detail": "Match request sent to mentor."})
     
 
+
+
+class MatchResponseView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request, match_request_id):
+        match_request = get_object_or_404(MatchRequest, id=match_request_id, mentor__user=request.user)
+        decision = request.data.get("decision")
+
+        if decision not in ["accept", "decline"]:
+            return Response({"error": "Decision must be 'accept' or 'decline'."}, status=400)
+
+        if decision == "accept":
+            match_request.status = "accepted"
+            match_request.save()
+
+            MentorshipLoop.objects.create(
+                mentor=match_request.mentor,
+                mentee=match_request.mentee,
+                start_date=timezone.now(),
+                end_date=timezone.now() + timedelta(weeks=4),
+                is_active=True
+            )
+
+            send_mail(
+                subject="Mentorship Request Accepted",
+                message=f"{match_request.mentor.first_name} {match_request.mentor.last_name} has accepted your mentorship request. Your 4-week loop has started!",
+                from_email=settings.DEFAULT_FROM_EMAIL,
+                recipient_list=[match_request.mentee.user.email]
+            )
+            
+        else:
+            match_request.status = "declined"
+            match_request.save()
+
+            send_mail(
+                subject="Mentorship Request Declined",
+                message=f"Unfortunately, {match_request.mentor.first_name} {match_request.mentor.last_name} has declined your mentorship request.",
+                from_email=settings.DEFAULT_FROM_EMAIL,
+                recipient_list=[match_request.mentee.user.email]
+            )
+
+        return Response({"detail": f"Match request {decision}ed."})

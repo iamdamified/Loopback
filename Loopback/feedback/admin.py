@@ -1,6 +1,6 @@
 from django.contrib import admin
-from .models import LoopFeedback
+from .models import MentorshipFeedback
 # Register your models here.
 
 
-admin.site.register(LoopFeedback)
+admin.site.register(MentorshipFeedback)

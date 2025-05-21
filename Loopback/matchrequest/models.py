@@ -1,16 +1,20 @@
+from django.contrib.auth import get_user_model
 from django.db import models
-from profiles.models import Profile
+from profiles.models import MenteeProfile, MentorProfile
 
-# Create your models here.
-# LOOP INFORMATION FOR ORGANISATION
-# This is a mentorship loop between a mentor and a mentee.
 
 class MatchRequest(models.Model):
-    mentor = models.ForeignKey(Profile, related_name='incoming_requests', on_delete=models.CASCADE)
-    mentee = models.ForeignKey(Profile, related_name='outgoing_requests', on_delete=models.CASCADE)
+    mentee = models.ForeignKey(MenteeProfile, on_delete=models.CASCADE)
+    mentor = models.ForeignKey(MentorProfile, on_delete=models.CASCADE)
     created_at = models.DateTimeField(auto_now_add=True)
-    is_approved = models.BooleanField(default=False)
-    responded = models.BooleanField(default=False)
+    status = models.CharField(max_length=10, choices=[
+        ('pending', 'Pending'),
+        ('accepted', 'Accepted'),
+        ('declined', 'Declined'),
+    ], default='pending')
 
     class Meta:
-        unique_together = ('mentor', 'mentee')
+        unique_together = ('mentee', 'mentor')
+
+    def __str__(self):
+        return f"{self.mentee.user.first_name} → {self.mentor.user.first_name} [{self.status}]"

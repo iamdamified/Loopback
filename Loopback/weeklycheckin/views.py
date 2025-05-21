@@ -1,15 +1,18 @@
 from django.shortcuts import render
-from .serializers import WeeklycheckinSerializer
-from .models import Weeklycheckin
-from rest_framework.permissions import IsAuthenticated
-from rest_framework import viewsets
+from .serializers import WeeklyCheckInSerializer
+from .models import WeeklyCheckIn
+from rest_framework import generics, permissions
 
-# Create your views here.
 
-class WeeklycheckinViewSet(viewsets.ModelViewSet):
-    queryset = Weeklycheckin.objects.all()
-    serializer_class = WeeklycheckinSerializer
-    permission_classes = [IsAuthenticated]
+# # Create your views here.
 
-    def perform_create(self, serializer):
-        serializer.save(created_by=self.request.user)
+
+
+
+# Weekly Check-In Submission
+class WeeklyCheckInCreateView(generics.CreateAPIView):
+    queryset = WeeklyCheckIn.objects.all()
+    serializer_class = WeeklyCheckInSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+

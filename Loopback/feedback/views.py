@@ -1,15 +1,21 @@
 from django.shortcuts import render
-from .serializers import LoopFeedbackSerializer
-from .models import LoopFeedback
-from rest_framework import viewsets
-from rest_framework.permissions import IsAuthenticated
+from .serializers import MentorshipFeedbackSerializer
+from .models import MentorshipFeedback
+from rest_framework import generics, permissions
 
-# Create your views here.
+# # Create your views here.
 
-class LoopFeedbackViewSet(viewsets.ModelViewSet):
-    queryset = LoopFeedback.objects.all()
-    serializer_class = LoopFeedbackSerializer
-    permission_classes = [IsAuthenticated]
-    
+# # Submit Feedback at the End of the Loop
+# class LoopFeedbackCreateView(generics.CreateAPIView):
+#     queryset = LoopFeedback.objects.all()
+#     serializer_class = LoopFeedbackSerializer
+#     permission_classes = [permissions.IsAuthenticated]
+
+
+class SubmitFeedbackView(generics.CreateAPIView):
+    queryset = MentorshipFeedback.objects.all()
+    serializer_class = MentorshipFeedbackSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
     def perform_create(self, serializer):
-        serializer.save(created_by=self.request.user)
+        serializer.save(user=self.request.user)

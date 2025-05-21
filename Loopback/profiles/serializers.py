@@ -1,62 +1,31 @@
-
-from users.models import User
-from .models import Profile, Interest, Skill
 from rest_framework import serializers
+from django.contrib.auth import get_user_model
+from .models import MentorProfile, MenteeProfile
+from users.serializers import UserRegistrationSerializer
+
+User = get_user_model()
 
 
-
-class ProfileSerializer(serializers.ModelSerializer):
-    role = serializers.CharField(source='user.role', read_only=True)
-    interests = serializers.PrimaryKeyRelatedField(
-        many=True,
-        queryset=Interest.objects.all()
-    )
-    skills = serializers.PrimaryKeyRelatedField(
-        many=True,
-        queryset=Skill.objects.all()
-    )
+# Mentor Profile Serializer
+class MentorProfileSerializer(serializers.ModelSerializer):
+    user = UserRegistrationSerializer(read_only=True)
 
     class Meta:
-        model = Profile
+        model = MentorProfile
         fields = [
-            'id', 'user', 'bio', 'goals', 'interests', 'skills', 'experience', 'role', 'company', 
-            'linkendin', 'job_title', 'website', 'industry', 'passport_image'
+            'id', 'user', 'passport_image', 'first_name', 'last_name', 'company', 'job_title',
+            'industry', 'bio', 'interests', 'goals', 'skills', 'experience',
+            'linkedin', 'website', 'X_account'
         ]
-        read_only_fields = ['user']
 
-    def create(self, validated_data):
-        interests = validated_data.pop('interests', [])
-        skills = validated_data.pop('skills', [])
-        profile = Profile.objects.create(**validated_data)
+# Mentee Profile Serializer
+class MenteeProfileSerializer(serializers.ModelSerializer):
+    user = UserRegistrationSerializer(read_only=True)
 
-        profile.interests.set(interests)
-        profile.skills.set(skills)
-        return profile
-
-    def update(self, instance, validated_data):
-        interests = validated_data.pop('interests', None)
-        skills = validated_data.pop('skills', None)
-
-        for attr, value in validated_data.items():
-            setattr(instance, attr, value)
-
-        if interests is not None:
-            instance.interests.set(interests)
-
-        if skills is not None:
-            instance.skills.set(skills)
-
-        instance.save()
-        return instance
-
-
-# For Backend Dynamic input Only.
-class InterestSerializer(serializers.ModelSerializer):
     class Meta:
-        model = Interest
-        fields = ['id', 'name']
-
-class SkillSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Skill
-        fields = ['id', 'name']
+        model = MenteeProfile
+        fields = [
+            'id', 'user', 'passport_image', 'first_name', 'last_name', 'company', 'job_title',
+            'industry', 'bio', 'interests', 'goals', 'skills', 'experience',
+            'linkedin', 'website', 'X_account'
+        ]

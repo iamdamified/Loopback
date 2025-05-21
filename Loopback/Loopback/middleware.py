@@ -6,6 +6,7 @@ EXEMPT_URLS = [
     '/api/auth/complete_role/', # api/auth/complete_role/
     '/api/auth/login/',     # api/auth/login/
     '/auth/google/',  # api/auth/google/ Google login endpoint
+    '/auth/register/',
     '/api/auth/token/',   # Token login endpoint
     '/api/auth/token/refresh/', # Token refresh endpoint
     '/api/auth/register/', # Register endpoint
