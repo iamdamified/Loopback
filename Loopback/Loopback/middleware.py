@@ -13,7 +13,8 @@ EXEMPT_URLS = [
     '/api/auth/verify-email/<int:uid>/<str:token>/', # Verify email endpoint
     '/api/auth/forgot-password/', # Password reset request endpoint
     '/api/auth/reset-password-confirm/', # Password reset confirm endpoint
-    '/api/auth/profile/' # Profile update endpoint
+    '/api/auth/mentee/profile/', # Profile update endpoint
+     '/api/auth/mentee/profile/' 
 ]
 
 class RoleRequiredMiddleware:

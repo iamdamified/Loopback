@@ -59,23 +59,11 @@ class RegisterView(APIView):
             )
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+
+
+
+
 # Verification of Email
-class VerifyEmailView(APIView):
-    def get(self, request, uid, token):
-        try:
-            user = User.objects.get(pk=uid)
-        except User.DoesNotExist:
-            return Response({'error': 'Invalid user'}, status=400)
-
-        if default_token_generator.check_token(user, token):
-            user.verified = True
-            user.is_active = True
-            user.save()
-            return Response({'message': 'Email verified! You can now log in.'}, status=200)
-
-        return Response({'error': 'Invalid or expired token'}, status=400)
-    
-User = get_user_model()
 
 class VerifyEmailView(APIView):
     def get(self, request, uid, token):
@@ -93,18 +81,9 @@ class VerifyEmailView(APIView):
             return Response({'message': 'Email verified! You can now log in.'}, status=status.HTTP_200_OK)
 
         return Response({'error': 'Invalid or expired token'}, status=status.HTTP_400_BAD_REQUEST)
-# LOG IN
-# class CustomTokenView(TokenObtainPairView):
-#     serializer_class = CustomTokenObtainPairSerializer
+    
 
-#     def post(self, request, *args, **kwargs):
-#         response = super().post(request, *args, **kwargs)
-#         user = request.user  # Make sure to access authenticated user
 
-#         if user and not user.role:
-#             raise AuthenticationFailed('Please complete your profile by selecting a role.')
-
-#         return response
     
 class CustomTokenView(TokenObtainPairView):
     serializer_class = CustomTokenObtainPairSerializer
@@ -265,19 +244,50 @@ class PasswordResetConfirmView(APIView):
 
 
 
-# Users Profile Creation
-# class CreateUserProfileView(CreateAPIView):
-#     serializer_class = ProfileSerializer
-#     permission_classes = [IsAuthenticated]
 
-#     def perform_create(self, serializer):
-#         profile = serializer.save(user=self.request.user)
 
-#         if profile.role == 'mentee':
-#             matched_mentor = search_mentor_for_mentee(profile)
-#             if matched_mentor:
-#                 Mentorship.objects.create(
-#                     mentor=matched_mentor,
-#                     mentee=profile,
-#                     is_active=True,
-#                 )
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+# class VerifyEmailView(APIView):
+#     def get(self, request, uid, token):
+#         try:
+#             user = User.objects.get(pk=uid)
+#         except User.DoesNotExist:
+#             return Response({'error': 'Invalid user'}, status=400)
+
+#         if default_token_generator.check_token(user, token):
+#             user.verified = True
+#             user.is_active = True
+#             user.save()
+#             return Response({'message': 'Email verified! You can now log in.'}, status=200)
+
+#         return Response({'error': 'Invalid or expired token'}, status=400)
+
+
+# LOG IN
+# class CustomTokenView(TokenObtainPairView):
+#     serializer_class = CustomTokenObtainPairSerializer
+
+#     def post(self, request, *args, **kwargs):
+#         response = super().post(request, *args, **kwargs)
+#         user = request.user  # Make sure to access authenticated user
+
+#         if user and not user.role:
+#             raise AuthenticationFailed('Please complete your profile by selecting a role.')
+
+#         return response

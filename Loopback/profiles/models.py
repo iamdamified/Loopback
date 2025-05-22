@@ -3,7 +3,6 @@ from django.db import models
 from django.contrib.auth import get_user_model
 
 User = get_user_model()
-
 # Mentor Model
 class MentorProfile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='mentor_profile')
