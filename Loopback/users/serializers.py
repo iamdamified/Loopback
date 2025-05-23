@@ -78,7 +78,7 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
             setattr(profile, field, value)
         profile.save()
 
-        return user, profile
+        return user
 
 
 
