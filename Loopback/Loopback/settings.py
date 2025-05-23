@@ -144,7 +144,7 @@ WSGI_APPLICATION = 'Loopback.wsgi.application'
 
 # RENDER cloud Postgres database
 DATABASES = {
-    'default': dj_database_url.parse(config("DATABASE_URL"))
+    'default': dj_database_url.parse(config("DATABASE_URL", default="sqlite:///db.sqlite3"))
 }
 
 
