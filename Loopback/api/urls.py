@@ -33,7 +33,7 @@ urlpatterns = [
 
     # USER ONBOARDING
     path('register/', RegisterView.as_view(), name='register'),
-    path('verify-email/<int:uid>/<str:token>/', VerifyEmailView.as_view(), name='verify-email'),
+    path('verify-email/<uidb64>/<token>/', VerifyEmailView.as_view(), name='verify-email'),
     path('token/', CustomTokenView.as_view(), name='token_obtain_pair'),
     path('token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),# to be added
     path('login/', LoginView.as_view(), name='login'),

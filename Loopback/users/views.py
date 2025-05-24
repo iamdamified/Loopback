@@ -66,10 +66,10 @@ class RegisterView(APIView):
 # Verification of Email
 
 class VerifyEmailView(APIView):
-    def get(self, request, uid, token):
+    def get(self, request, uidb64, token):
         try:
             # Decode base64 uid to get user ID
-            uid = force_str(urlsafe_base64_decode(uid))
+            uid = force_str(urlsafe_base64_decode(uidb64))
             user = User.objects.get(pk=uid)
         except (TypeError, ValueError, OverflowError, User.DoesNotExist):
             return Response({'error': 'Invalid user'}, status=status.HTTP_400_BAD_REQUEST)
@@ -83,6 +83,20 @@ class VerifyEmailView(APIView):
         return Response({'error': 'Invalid or expired token'}, status=status.HTTP_400_BAD_REQUEST)
     
 
+# class VerifyEmailView(APIView):
+#     def get(self, request, uid, token):
+#         try:
+#             user = User.objects.get(pk=uid)
+#         except User.DoesNotExist:
+#             return Response({'error': 'Invalid user'}, status=400)
+
+#         if default_token_generator.check_token(user, token):
+#             user.verified = True
+#             user.is_active = True
+#             user.save()
+#             return Response({'message': 'Email verified! You can now log in.'}, status=200)
+
+#         return Response({'error': 'Invalid or expired token'}, status=400)
 
     
 class CustomTokenView(TokenObtainPairView):
