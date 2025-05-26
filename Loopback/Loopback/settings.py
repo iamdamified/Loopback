@@ -46,7 +46,7 @@ SITE_ID = 2
 REST_USE_JWT = True
 # TOKEN_MODEL = None
 
-ACCOUNT_USER_MODEL_USERNAME_FIELD = None
+# ACCOUNT_USER_MODEL_USERNAME_FIELD = None
 ACCOUNT_AUTHENTICATION_METHOD = 'email'  # or 'username' or 'username_email' or 'email'
 ACCOUNT_EMAIL_REQUIRED = True
 ACCOUNT_USERNAME_REQUIRED = False  # email-only login
