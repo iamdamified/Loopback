@@ -4,6 +4,7 @@ from .models import User
 from profiles.models import MentorProfile, MenteeProfile
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from django.contrib.auth import get_user_model
+from dj_rest_auth.registration.serializers import RegisterSerializer
 
 User = get_user_model()
 
@@ -82,6 +83,19 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
 
 
 
+
+
+class CustomRegisterSerializer(RegisterSerializer):
+    username = None  # remove username field
+
+    def get_cleaned_data(self):
+        return {
+            'email': self.validated_data.get('email', ''),
+            'password1': self.validated_data.get('password1', ''),
+            'password2': self.validated_data.get('password2', ''),
+            'first_name': self.validated_data.get('first_name', ''),
+            'last_name': self.validated_data.get('last_name', ''),
+        }
 
 
 # User = get_user_model()

@@ -47,11 +47,15 @@ REST_USE_JWT = True
 # TOKEN_MODEL = None
 
 ACCOUNT_USER_MODEL_USERNAME_FIELD = None
-# ACCOUNT_AUTHENTICATION_METHOD = 'email'  # or 'username' or 'username_email' or 'email'
+ACCOUNT_AUTHENTICATION_METHOD = 'email'  # or 'username' or 'username_email' or 'email'
 # ACCOUNT_EMAIL_REQUIRED = True
-# ACCOUNT_USERNAME_REQUIRED = False  # email-only login
+ACCOUNT_USERNAME_REQUIRED = False  # email-only login
 ACCOUNT_EMAIL_VERIFICATION = 'none' # 'mandatory' or 'none' or 'optional'
 
+
+# ACCOUNT_USER_MODEL_USERNAME_FIELD = None
+# ACCOUNT_USERNAME_REQUIRED = False
+# ACCOUNT_AUTHENTICATION_METHOD = 'email'
 
 ACCOUNT_SIGNUP_FIELDS = ['email*', 'password1*', 'password2*']
 ACCOUNT_LOGIN_METHODS = {'email'}
@@ -236,10 +240,16 @@ SOCIALACCOUNT_PROVIDERS = {
             'client_id': config('GOOGLE_CLIENT_ID'),
             'secret': config('GOOGLE_SECRET'),
             'key': ''
+        },
+        'SCOPE': ['profile', 'email'],
+        'AUTH_PARAMS': {
+            'access_type': 'online',
         }
     }
 }
 
+
+ACCOUNT_ADAPTER = 'users.adapters.NoRedirectAccountAdapter'
 
 
 
