@@ -1,12 +1,11 @@
 from django.urls import path, include
 # from rest_framework.authtoken.views import obtain_auth_token
-from users.views import CustomTokenView, RegisterView, VerifyEmailView, LoginView,  PasswordResetRequestView, PasswordResetConfirmView
+from users.views import CustomTokenView, RegisterView, VerifyEmailView, LoginView,  PasswordResetRequestView, PasswordResetConfirmView, CustomGoogleLoginView
 from matchrequest.views import MatchRequestView, MatchResponseView
 from mentorship.views import MentorshipLoopViewSet, DashboardView
 from weeklycheckin.views import WeeklyCheckInCreateView
 from feedback.views import SubmitFeedbackView
 from profiles.views import MentorProfileDetailView, MenteeProfileDetailView
-from users.views import CustomGoogleLoginView,  complete_role
 from rest_framework_simplejwt.views import TokenRefreshView
 from rest_framework.routers import DefaultRouter
 
@@ -39,19 +38,17 @@ urlpatterns = [
     path('login/', LoginView.as_view(), name='login'),
     path('forgot-password/', PasswordResetRequestView.as_view(), name='forgot-password'),
     path('reset-password-confirm/', PasswordResetConfirmView.as_view(), name='reset-password-confirm'),
-    
-
     # Google login
     path('auth/google/', CustomGoogleLoginView.as_view(), name='google_login'),
-    path('complete-role/', complete_role, name='complete_role'),
-
     # User Profiles
     path('mentor/profile/', MentorProfileDetailView.as_view(), name='mentor-profile'),
     path('mentee/profile/', MenteeProfileDetailView.as_view(), name='mentee-profile'),
 
+
+
     # Mentee Match Request and Mentor Response
     path("match-request/<int:pk>/request/", MatchRequestView.as_view(), name="match-request"),
-    path("match-request/<int:pk>/decision/", MatchResponseView.as_view(), name="match-response"),
+    path("match-response/<int:pk>/decision/", MatchResponseView.as_view(), name="match-response"),
 
     # MENTORSHIP
     path("weekly-checkin/", WeeklyCheckInCreateView.as_view(), name="weekly-checkin"),
