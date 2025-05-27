@@ -53,9 +53,6 @@ ACCOUNT_USERNAME_REQUIRED = False  # email-only login
 ACCOUNT_EMAIL_VERIFICATION = 'none' # 'mandatory' or 'none' or 'optional'
 
 
-# ACCOUNT_USER_MODEL_USERNAME_FIELD = None
-# ACCOUNT_USERNAME_REQUIRED = False
-# ACCOUNT_AUTHENTICATION_METHOD = 'email'
 
 ACCOUNT_SIGNUP_FIELDS = ['email*', 'password1*', 'password2*']
 ACCOUNT_LOGIN_METHODS = {'email'}
@@ -110,6 +107,13 @@ MIDDLEWARE = [
     'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',
 ]
+
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:3000",
+]
+
+# Don't do the below in production but for allowing more users for development purposes
+CORS_ALLOW_ALL_ORIGINS = True
 
 ROOT_URLCONF = 'Loopback.urls'
 

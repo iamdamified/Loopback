@@ -22,6 +22,7 @@ from django.contrib.auth.decorators import login_required
 from allauth.socialaccount.providers.google.views import GoogleOAuth2Adapter
 from dj_rest_auth.registration.views import SocialLoginView
 from allauth.socialaccount.providers.oauth2.client import OAuth2Client
+from django.http import HttpResponseRedirect
 
 # Create your views here.
 
@@ -78,25 +79,13 @@ class VerifyEmailView(APIView):
             user.verified = True  
             user.is_active = True
             user.save()
-            return Response({'message': 'Email verified! You can now log in.'}, status=status.HTTP_200_OK)
+            # return Response({'message': 'Email verified! You can now log in.'}, status=status.HTTP_200_OK)
+            return HttpResponseRedirect('http://localhost:3000/verify')
 
         return Response({'error': 'Invalid or expired token'}, status=status.HTTP_400_BAD_REQUEST)
     
 
-# class VerifyEmailView(APIView):
-#     def get(self, request, uid, token):
-#         try:
-#             user = User.objects.get(pk=uid)
-#         except User.DoesNotExist:
-#             return Response({'error': 'Invalid user'}, status=400)
 
-#         if default_token_generator.check_token(user, token):
-#             user.verified = True
-#             user.is_active = True
-#             user.save()
-#             return Response({'message': 'Email verified! You can now log in.'}, status=200)
-
-#         return Response({'error': 'Invalid or expired token'}, status=400)
 
     
 class CustomTokenView(TokenObtainPairView):
@@ -173,31 +162,31 @@ class LoginView(APIView):
 # Social login view
 class CustomGoogleLoginView(SocialLoginView):
     adapter_class = GoogleOAuth2Adapter
-    # client_class = OAuth2Client
-    # callback_url = "http://localhost:8000/api/auth/google/callback/"
 
     def post(self, request, *args, **kwargs):
         response = super().post(request, *args, **kwargs)
 
-        token = response.data.get("access_token")
+        # token = response.data.get("access_token")
         user = self.request.user
-        if user.is_authenticated and not user.role:
-            return redirect(reverse("complete_role"))
+        # if user.is_authenticated and not user.role:
+        if user.is_authenticated and not getattr(user, 'role', None):
+            # Redirect to frontend with user ID for role selection
+            redirect_url = f"http://localhost:3000/user-role?user_id={user.id}"
+            return HttpResponseRedirect(redirect_url)
 
         return response
 
-
-@login_required
-def complete_role(request):
-    if request.method == 'POST':
-        role = request.POST.get('role')
-        if role and role in dict(User.ROLE_CHOICES):
-            request.user.role = role
-            request.user.save()
-            return redirect('dashboard')  # Or dashboard page
-    return render(request, 'complete_roles.html', {
-        "roles": User.ROLE_CHOICES,
-    })
+# @login_required
+# def complete_role(request):
+#     if request.method == 'POST':
+#         role = request.POST.get('role')
+#         if role and role in dict(User.ROLE_CHOICES):
+#             request.user.role = role
+#             request.user.save()
+#             return redirect('dashboard')  # Or dashboard page
+#     return render(request, 'http://localhost:3000/user-role', {
+#         "roles": User.ROLE_CHOICES,
+#     })
 
 
 class PasswordResetRequestView(APIView):
