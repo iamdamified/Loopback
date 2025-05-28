@@ -35,7 +35,7 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
         fields = [
             'email', 'password', 'first_name', 'last_name', 'role',
             'passport_image', 'company', 'job_title', 'industry', 'bio',
-            'interests', 'goals', 'skills', 'experience', 'linkedin',
+            'interests', 'goals', 'skills', 'experience_years', 'linkedin',
             'website', 'X_account', 'expertise'
         ]
 
@@ -55,7 +55,7 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
             'interests': validated_data.pop('interests', ''),
             'goals': validated_data.pop('goals', ''),
             'skills': validated_data.pop('skills', ''),
-            'experience': validated_data.pop('experience', 0),
+            'experience_years': validated_data.pop('experience_years', 0),
             'linkedin': validated_data.pop('linkedin', ''),
             'website': validated_data.pop('website', ''),
             'X_account': validated_data.pop('X_account', ''),
