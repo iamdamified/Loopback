@@ -36,7 +36,7 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
             'email', 'password', 'first_name', 'last_name', 'role',
             'passport_image', 'company', 'job_title', 'industry', 'bio',
             'interests', 'goals', 'skills', 'experience', 'linkedin',
-            'website', 'X_account'
+            'website', 'X_account', 'expertise'
         ]
 
     def create(self, validated_data):
@@ -58,7 +58,9 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
             'experience': validated_data.pop('experience', 0),
             'linkedin': validated_data.pop('linkedin', ''),
             'website': validated_data.pop('website', ''),
-            'X_account': validated_data.pop('X_account', '')
+            'X_account': validated_data.pop('X_account', ''),
+            'expertise': validated_data.pop('expertise', '')
+
         }
 
         # Create the user
