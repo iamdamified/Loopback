@@ -174,7 +174,7 @@ class PasswordResetRequestView(APIView):
         if user:
             uid = urlsafe_base64_encode(force_bytes(user.pk))
             token = default_token_generator.make_token(user)
-            reset_url = f"http://localhost:3000/reset-password/?uid={uid}&token={token}"
+            reset_url = f"http://loopback-f6mg.onrender.com/reset-password/?uid={uid}&token={token}"
 
             try:
                 send_mail(
