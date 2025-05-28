@@ -89,7 +89,7 @@ class CustomTokenView(TokenObtainPairView):
         # Now, we can access the authenticated user
         token = response.data.get("access")
         if token:
-            access_token = AccessToken(token) # Use the token to get the user
+            access_token = AccessToken(token) # token to get the user
             user_id = access_token["user_id"]
             first_name = access_token["first_name"]
             last_name = access_token["last_name"]
@@ -103,6 +103,18 @@ class CustomTokenView(TokenObtainPairView):
                 raise AuthenticationFailed('Please complete your profile by selecting a role.')
 
         return response
+        # return Response(
+        #     {
+        #         "refresh": str(refresh),
+        #         "access": str(refresh.access_token),
+        #         # "username": user.username,
+        #         "first_name": user.first_name,
+        #         "last_name": user.last_name,
+        #         "email": user.email,
+        #         "role": user.role,
+        #     },
+        #     status=status.HTTP_200_OK
+        # )
 
 
 class LoginView(APIView):
@@ -140,7 +152,7 @@ class LoginView(APIView):
 
 
 
-# Social login view
+# Google Social Register/login view
 class CustomGoogleLoginView(SocialLoginView):
     adapter_class = GoogleOAuth2Adapter
 
@@ -174,7 +186,7 @@ class PasswordResetRequestView(APIView):
         if user:
             uid = urlsafe_base64_encode(force_bytes(user.pk))
             token = default_token_generator.make_token(user)
-            reset_url = f"http://loopback-f6mg.onrender.com/reset-password/?uid={uid}&token={token}"
+            reset_url = f"http://localhost:3000/reset-password?uid={uid}&token={token}"
 
             try:
                 send_mail(
@@ -214,5 +226,7 @@ class PasswordResetConfirmView(APIView):
         user.password = make_password(new_password)
         user.save()
         return Response({'message': 'Password reset successful'})
+        # redirect_url = f"http://localhost:3000/password-success-page?user_id={user.id}" hoping frontend will handle this and ask 
+        # return HttpResponseRedirect(redirect_url)
 
 
