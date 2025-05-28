@@ -1,6 +1,6 @@
 from django.urls import path, include
 # from rest_framework.authtoken.views import obtain_auth_token
-from users.views import CustomTokenView, RegisterView, VerifyEmailView, LoginView,  PasswordResetRequestView, PasswordResetConfirmView, CustomGoogleLoginView
+from users.views import CustomTokenView, RegisterView, VerifyEmailView, PasswordResetRequestView, PasswordResetConfirmView, CustomGoogleLoginView
 from matchrequest.views import MatchRequestView, MatchResponseView
 from mentorship.views import MentorshipLoopViewSet, DashboardView
 from weeklycheckin.views import WeeklyCheckInCreateView
@@ -33,13 +33,13 @@ urlpatterns = [
     # USER ONBOARDING
     path('register/', RegisterView.as_view(), name='register'),
     path('verify-email/<uidb64>/<token>/', VerifyEmailView.as_view(), name='verify-email'),
-    path('token/', CustomTokenView.as_view(), name='token_obtain_pair'),
+    path('login/', CustomTokenView.as_view(), name='token_obtain_login'),
     path('token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
-    path('login/', LoginView.as_view(), name='login'),
     path('forgot-password/', PasswordResetRequestView.as_view(), name='forgot-password'),
     path('reset-password-confirm/', PasswordResetConfirmView.as_view(), name='reset-password-confirm'),
-    # Google login
-    path('auth/google/', CustomGoogleLoginView.as_view(), name='google_login'),
+    path('auth/google/', CustomGoogleLoginView.as_view(), name='google_login'), # Google register/login
+
+    
     # User Profiles
     path('mentor/profile/', MentorProfileDetailView.as_view(), name='mentor-profile'),
     path('mentee/profile/', MenteeProfileDetailView.as_view(), name='mentee-profile'),

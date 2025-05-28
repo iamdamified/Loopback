@@ -24,10 +24,11 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
     interests = serializers.CharField(required=False, allow_blank=True)
     goals = serializers.CharField(required=False, allow_blank=True)
     skills = serializers.CharField(required=False, allow_blank=True)
-    experience = serializers.IntegerField(required=False, allow_null=True)
+    experience_years = serializers.IntegerField(required=False, allow_null=True)
     linkedin = serializers.URLField(required=False, allow_blank=True)
     website = serializers.URLField(required=False, allow_blank=True)
     X_account = serializers.CharField(required=False, allow_blank=True)
+    expertise = serializers.CharField(required=False, allow_blank=True)
 
     class Meta:
         model = User

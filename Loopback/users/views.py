@@ -23,7 +23,7 @@ from django.http import HttpResponseRedirect
 
 User = get_user_model()
 
-# User Registrations with Verification
+# User Registrations with Verification(Mentors and Mentees)
 class RegisterView(APIView):
     def post(self, request):
         serializer = UserRegistrationSerializer(data=request.data)
@@ -78,77 +78,36 @@ class VerifyEmailView(APIView):
 
 
 
-    
+# Login View with JWT Token Generation
 class CustomTokenView(TokenObtainPairView):
     serializer_class = CustomTokenObtainPairSerializer
 
     def post(self, request, *args, **kwargs):
-        # Generate tokens and validate credentials
-        response = super().post(request, *args, **kwargs)
+        serializer = self.get_serializer(data=request.data)
+        try:
+            serializer.is_valid(raise_exception=True)
+        except AuthenticationFailed as e:
+            raise e
 
-        # Now, we can access the authenticated user
-        token = response.data.get("access")
-        if token:
-            access_token = AccessToken(token) # token to get the user
-            user_id = access_token["user_id"]
-            first_name = access_token["first_name"]
-            last_name = access_token["last_name"]
-            email = access_token["email"]
-            role = access_token["role"]
-
-            User = get_user_model()  # Fetch the actual user object
-            user = User.objects.get(id=user_id, first_name=first_name, last_name=last_name, email=email, role=role)
-
-            if not user.role: # Check for role
-                raise AuthenticationFailed('Please complete your profile by selecting a role.')
-
-        return response
-        # return Response(
-        #     {
-        #         "refresh": str(refresh),
-        #         "access": str(refresh.access_token),
-        #         # "username": user.username,
-        #         "first_name": user.first_name,
-        #         "last_name": user.last_name,
-        #         "email": user.email,
-        #         "role": user.role,
-        #     },
-        #     status=status.HTTP_200_OK
-        # )
-
-
-class LoginView(APIView):
-    def post(self, request):
-        email = request.data.get('email')
-        password = request.data.get('password')
-        user = authenticate(email=email, password=password)
-
-        # Handle invalid credentials
-        if not user:
-            return Response({"error": "Invalid credentials"}, status=status.HTTP_401_UNAUTHORIZED)
-
+        user = serializer.user
         # Handle inactive users
         if not user.is_active:
             return Response({"error": "Account is inactive"}, status=status.HTTP_403_FORBIDDEN)
 
-        # Handle missing role
-        if not hasattr(user, 'role') or not user.role:
-            return Response({"error": "Please complete your profile by selecting a role."}, status=status.HTTP_403_FORBIDDEN)
+        if not user.role:
+            raise AuthenticationFailed('Please complete your profile by selecting a role.')
 
-        # Generate tokens
         refresh = RefreshToken.for_user(user)
-        return Response(
-            {
-                "refresh": str(refresh),
-                "access": str(refresh.access_token),
-                # "username": user.username,
-                "first_name": user.first_name,
-                "last_name": user.last_name,
-                "email": user.email,
-                "role": user.role,
-            },
-            status=status.HTTP_200_OK
-        )
+        access = refresh.access_token
+
+        return Response({
+            "refresh": str(refresh),
+            "access": str(access),
+            "first_name": user.first_name,
+            "last_name": user.last_name,
+            "email": user.email,
+            "role": user.role,
+        }, status=status.HTTP_200_OK)
 
 
 
@@ -171,6 +130,7 @@ class CustomGoogleLoginView(SocialLoginView):
 
 
 
+# Password Reset Request View
 class PasswordResetRequestView(APIView):
     def post(self, request):
         email = request.data.get('email')
@@ -202,12 +162,12 @@ class PasswordResetRequestView(APIView):
                     status=status.HTTP_500_INTERNAL_SERVER_ERROR
                 )
 
-        # Always return a generic message
         return Response(
             {"message": "A reset link will be sent to your email if it exists."},
             status=status.HTTP_200_OK
         )
 
+# Password Reset Success View
 class PasswordResetConfirmView(APIView):
     def post(self, request):
         uidb64 = request.data.get('uid')
@@ -230,3 +190,98 @@ class PasswordResetConfirmView(APIView):
         # return HttpResponseRedirect(redirect_url)
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+# class LoginView(APIView):
+#     def post(self, request):
+#         email = request.data.get('email')
+#         password = request.data.get('password')
+#         user = authenticate(email=email, password=password)
+
+#         # Handle invalid credentials
+#         if not user:
+#             return Response({"error": "Invalid credentials"}, status=status.HTTP_401_UNAUTHORIZED)
+
+#         # Handle inactive users
+#         if not user.is_active:
+#             return Response({"error": "Account is inactive"}, status=status.HTTP_403_FORBIDDEN)
+
+#         # Handle missing role
+#         if not hasattr(user, 'role') or not user.role:
+#             return Response({"error": "Please complete your profile by selecting a role."}, status=status.HTTP_403_FORBIDDEN)
+
+#         # Generate tokens
+#         refresh = RefreshToken.for_user(user)
+#         return Response(
+#             {
+#                 "refresh": str(refresh),
+#                 "access": str(refresh.access_token),
+#                 # "username": user.username,
+#                 "first_name": user.first_name,
+#                 "last_name": user.last_name,
+#                 "email": user.email,
+#                 "role": user.role,
+#             },
+#             status=status.HTTP_200_OK
+#         )
+
+
+
+# class CustomTokenView(TokenObtainPairView):
+#     serializer_class = CustomTokenObtainPairSerializer
+
+#     def post(self, request, *args, **kwargs):
+#         # Generate tokens and validate credentials
+#         response = super().post(request, *args, **kwargs)
+
+#         # Now, we can access the authenticated user
+#         token = response.data.get("access")
+#         if token:
+#             access_token = AccessToken(token) # token to get the user
+#             user_id = access_token["user_id"]
+
+#             User = get_user_model()  # Fetch the actual user object
+#             user = User.objects.get(id=user_id)
+
+#             if not user.role: # Check for role
+#                 raise AuthenticationFailed('Please complete your profile by selecting a role.')
+
+#         # return response
+#         return Response(
+#             {
+                
+#                 "access": access_token,
+#                 "refresh": str(RefreshToken.for_user(user)),
+#                 # "username": user.username,
+#                 "first_name": user.first_name,
+#                 "last_name": user.last_name,
+#                 "email": user.email,
+#                 "role": user.role,
+#             },
+#             status=status.HTTP_200_OK
+#         )

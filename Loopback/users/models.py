@@ -51,6 +51,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     linkedin = models.URLField(max_length=500, blank=True, null=True)
     website = models.URLField(max_length=500, blank=True, null=True)
     X_account = models.CharField(max_length=100, blank=True, null=True)
+    expertise = models.CharField(max_length=225, blank=True, null=True)
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)
     date_joined = models.DateTimeField(default=timezone.now)
