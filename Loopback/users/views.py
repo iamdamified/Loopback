@@ -2,33 +2,24 @@ from django.shortcuts import render, redirect
 from .models import User
 from .serializers import UserRegistrationSerializer, CustomTokenObtainPairSerializer
 from rest_framework.views import APIView
-from rest_framework.decorators import action
 from rest_framework.response import Response
-from rest_framework import permissions, status, viewsets
-from rest_framework.permissions import IsAuthenticated
+from rest_framework import status
 from rest_framework.exceptions import AuthenticationFailed
 from rest_framework_simplejwt.tokens import RefreshToken, AccessToken
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 from django.contrib.auth import get_user_model, authenticate
 from django.contrib.auth.tokens import default_token_generator
 from django.core.mail import send_mail
-from django.urls import reverse
 from django.conf import settings
 from django.utils.http import urlsafe_base64_decode, urlsafe_base64_encode
 from django.utils.encoding import force_str
 from django.utils.encoding import force_bytes
 from django.contrib.auth.hashers import make_password
-from django.contrib.auth.decorators import login_required
 from allauth.socialaccount.providers.google.views import GoogleOAuth2Adapter
 from dj_rest_auth.registration.views import SocialLoginView
-from allauth.socialaccount.providers.oauth2.client import OAuth2Client
 from django.http import HttpResponseRedirect
 
 # Create your views here.
-
-
-# class CustomTokenView(TokenObtainPairView):
-#     serializer_class = CustomTokenObtainPairSerializer
 
 User = get_user_model()
 
@@ -45,7 +36,7 @@ class RegisterView(APIView):
             token = default_token_generator.make_token(user)
             uid = urlsafe_base64_encode(force_bytes(user.pk))
 
-            verify_url = f"http://localhost:8000/api/auth/verify-email/{uid}/{token}/"
+            verify_url = f"http://loopback-f6mg.onrender.com/api/auth/verify-email/{uid}/{token}/"
 
             send_mail(
                 subject="Verify your Email",
@@ -100,9 +91,13 @@ class CustomTokenView(TokenObtainPairView):
         if token:
             access_token = AccessToken(token) # Use the token to get the user
             user_id = access_token["user_id"]
+            first_name = access_token["first_name"]
+            last_name = access_token["last_name"]
+            email = access_token["email"]
+            role = access_token["role"]
 
             User = get_user_model()  # Fetch the actual user object
-            user = User.objects.get(id=user_id)
+            user = User.objects.get(id=user_id, first_name=first_name, last_name=last_name, email=email, role=role)
 
             if not user.role: # Check for role
                 raise AuthenticationFailed('Please complete your profile by selecting a role.')
@@ -143,20 +138,6 @@ class LoginView(APIView):
             status=status.HTTP_200_OK
         )
 
-        # if user:
-        #     if not user.role:
-        #         return Response({"error": "Please complete your profile by selecting a role."}, status=status.HTTP_403_FORBIDDEN)
-
-        #     refresh = RefreshToken.for_user(user)
-        #     return Response(
-        #         {"refresh": str(refresh), "access": str(refresh.access_token)},
-        #         status=status.HTTP_200_OK
-        #     )
-        # return Response({"error": "Invalid credentials"}, status=status.HTTP_401_UNAUTHORIZED)
-
-
-
-
 
 
 # Social login view
@@ -176,17 +157,6 @@ class CustomGoogleLoginView(SocialLoginView):
 
         return response
 
-# @login_required
-# def complete_role(request):
-#     if request.method == 'POST':
-#         role = request.POST.get('role')
-#         if role and role in dict(User.ROLE_CHOICES):
-#             request.user.role = role
-#             request.user.save()
-#             return redirect('dashboard')  # Or dashboard page
-#     return render(request, 'http://localhost:3000/user-role', {
-#         "roles": User.ROLE_CHOICES,
-#     })
 
 
 class PasswordResetRequestView(APIView):
@@ -204,7 +174,7 @@ class PasswordResetRequestView(APIView):
         if user:
             uid = urlsafe_base64_encode(force_bytes(user.pk))
             token = default_token_generator.make_token(user)
-            reset_url = f"http://localhost:8000/api/auth/reset-password-confirm/?uid={uid}&token={token}"
+            reset_url = f"http://localhost:3000/reset-password/?uid={uid}&token={token}"
 
             try:
                 send_mail(
@@ -246,51 +216,3 @@ class PasswordResetConfirmView(APIView):
         return Response({'message': 'Password reset successful'})
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-# class VerifyEmailView(APIView):
-#     def get(self, request, uid, token):
-#         try:
-#             user = User.objects.get(pk=uid)
-#         except User.DoesNotExist:
-#             return Response({'error': 'Invalid user'}, status=400)
-
-#         if default_token_generator.check_token(user, token):
-#             user.verified = True
-#             user.is_active = True
-#             user.save()
-#             return Response({'message': 'Email verified! You can now log in.'}, status=200)
-
-#         return Response({'error': 'Invalid or expired token'}, status=400)
-
-
-# LOG IN
-# class CustomTokenView(TokenObtainPairView):
-#     serializer_class = CustomTokenObtainPairSerializer
-
-#     def post(self, request, *args, **kwargs):
-#         response = super().post(request, *args, **kwargs)
-#         user = request.user  # Make sure to access authenticated user
-
-#         if user and not user.role:
-#             raise AuthenticationFailed('Please complete your profile by selecting a role.')
-
-#         return response

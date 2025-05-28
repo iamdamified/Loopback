@@ -8,7 +8,7 @@ from dj_rest_auth.registration.serializers import RegisterSerializer
 
 User = get_user_model()
 
-
+# This serialiszer is used to manage role-based access control and attributes based control to profile models from user registration.
 class UserRegistrationSerializer(serializers.ModelSerializer):
     password = serializers.CharField(write_only=True)
     role = serializers.ChoiceField(choices=User.ROLE_CHOICES)
@@ -84,7 +84,7 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
 
 
 
-
+# GOOGLE OAUTH2 REGISTRATION/LOGIN SERIALIZER
 class CustomRegisterSerializer(RegisterSerializer):
     username = None  # remove username field
 
@@ -101,49 +101,8 @@ class CustomRegisterSerializer(RegisterSerializer):
 # User = get_user_model()
 
 
-# # USERS INFORMATION SERIALIZERS
-# class UserRegistrationSerializer(serializers.ModelSerializer):
-#     password = serializers.CharField(write_only=True)
-#     role = serializers.ChoiceField(choices=User.ROLE_CHOICES)
-#     first_name = serializers.CharField()
-#     last_name = serializers.CharField()
-#     # Extra profile fields
-#     company = serializers.CharField(required=False, allow_blank=True)
-#     job_title = serializers.CharField(required=False, allow_blank=True)
-#     industry = serializers.CharField(required=False, allow_blank=True)
-#     passport_image = serializers.ImageField(required=False)
 
-#     class Meta:
-#         model = User
-#         fields = [
-#             'email', 'password', 'first_name', 'last_name',
-#             'role', 'company', 'job_title', 'industry', 'passport_image'
-#         ]
-
-#     def create(self, validated_data):
-#         role = validated_data.pop('role')
-#         password = validated_data.pop('password')
-#         validated_data.pop('company', '')
-#         validated_data.pop('job_title', '')
-#         validated_data.pop('industry', '')
-#         validated_data.pop('passport_image', None)
-
-#         user = User.objects.create_user(
-#             password=password,
-#             role=role,
-#             **validated_data
-#         )
-#         user.is_active = False  # Optional: block login until email is verified
-#         user.save()
-#         return user
-# class UserSerializer(serializers.ModelSerializer):
-#     class Meta:
-#         model = User
-#         fields = ['id','email', 'role', 'first_name', 'last_name', 'verified']
-
-
-
-# AUTHENTICATION SERIALIZER FOR API
+# AUTHENTICATION SERIALIZER FOR LOGIN API
 class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
     def validate(self, attrs):
         data = super().validate(attrs)
@@ -152,10 +111,3 @@ class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
         data['user_id'] = self.user.id
         data['role'] = self.user.role
         return data
-
-# class ProfileSerializer(serializers.ModelSerializer):
-#     user = UserSerializer(read_only=True)
-
-#     class Meta:
-#         model = Profile
-#         fields = ['user', 'bio', 'interests', 'goals', 'skills', 'experience']
