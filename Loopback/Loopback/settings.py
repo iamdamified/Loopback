@@ -13,7 +13,7 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 import os
 from pathlib import Path
 import dj_database_url
-from decouple import config
+from decouple import config, Csv
 
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -26,10 +26,12 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = config("SECRET_KEY")
 
-# SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+ENVIRONMENT = config("ENVIRONMENT", default="development")
 
-ALLOWED_HOSTS = ['http://localhost:3000','loopback-f6mg.onrender.com','https://loopback-f6mg.onrender.com','http://127.0.0.1:8000','http://localhost:8000']
+# SECURITY WARNING: don't run with debug turned on in production!
+DEBUG = config("DEBUG", default=True, cast=bool)
+
+ALLOWED_HOSTS = config("ALLOWED_HOSTS", default="localhost", cast = Csv())
 
 # or
 # ALLOWED_HOSTS = []
@@ -137,25 +139,27 @@ TEMPLATES = [
 WSGI_APPLICATION = 'Loopback.wsgi.application'
 
 
-# Database
-# https://docs.djangoproject.com/en/5.2/ref/settings/#databases
+if ENVIRONMENT == 'production':
 
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.postgresql',
-#         'NAME': 'Loopback',
-#         'USER': 'postgres',
-#         'PASSWORD': config("DB_PASSWORD"),
-#         'HOST': 'localhost',
-#         'PORT': '5433',
-#     }
-# }
+    # Database
+    # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.postgresql',
+            'NAME': config("DB_PASSWORD"),
+            'USER': config("DB_PASSWORD"),
+            'PASSWORD': config("DB_PASSWORD"),
+            'HOST': 'localhost',
+            'PORT': config("DB_PASSWORD"),
+        }
+    }
+else:
 
-# RENDER cloud Postgres database
-DATABASES = {
-    'default': dj_database_url.parse(config("DATABASE_URL"))
-}
+    # RENDER cloud Postgres database
+    DATABASES = {
+        'default': dj_database_url.parse(config("DATABASE_URL"))
+    }
 
 
 
