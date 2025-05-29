@@ -147,11 +147,11 @@ if ENVIRONMENT == 'production':
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.postgresql',
-            'NAME': config("DB_PASSWORD"),
-            'USER': config("DB_PASSWORD"),
-            'PASSWORD': config("DB_PASSWORD"),
+            'NAME': config("DATABASE_NAME"),
+            'USER': config("DATABASE_USER"),
+            'PASSWORD': config("DATABASE_PASSWORD"),
             'HOST': 'localhost',
-            'PORT': config("DB_PASSWORD"),
+            'PORT': config("DATABASE_PORT"),
         }
     }
 else:
