@@ -29,7 +29,7 @@ SECRET_KEY = config("SECRET_KEY")
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ["*"]
+ALLOWED_HOSTS = ['http://localhost:3000','loopback-f6mg.onrender.com','https://loopback-f6mg.onrender.com','http://127.0.0.1:8000','http://localhost:8000']
 
 # or
 # ALLOWED_HOSTS = []
@@ -110,6 +110,8 @@ MIDDLEWARE = [
 
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000",
+    "https://loopback-f6mg.onrender.com",
+    "http://localhost:800",
 ]
 
 # Don't do the below in production but for allowing more users for development purposes
