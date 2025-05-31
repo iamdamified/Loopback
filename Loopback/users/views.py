@@ -71,7 +71,7 @@ class VerifyEmailView(APIView):
             user.is_active = True
             user.save()
             # return Response({'message': 'Email verified! You can now log in.'}, status=status.HTTP_200_OK)
-            return HttpResponseRedirect('http://localhost:3000/verify')
+            return HttpResponseRedirect('https://loop-back-two.vercel.app/verify')
 
         return Response({'error': 'Invalid or expired token'}, status=status.HTTP_400_BAD_REQUEST)
     
@@ -123,7 +123,7 @@ class CustomGoogleLoginView(SocialLoginView):
         # if user.is_authenticated and not user.role:
         if user.is_authenticated and not getattr(user, 'role', None):
             # Redirect to frontend with user ID for role selection
-            redirect_url = f"http://localhost:3000/user-role?user_id={user.id}"
+            redirect_url = f"https://loop-back-two.vercel.app/user-role?user_id={user.id}"
             return HttpResponseRedirect(redirect_url)
 
         return response
@@ -146,7 +146,8 @@ class PasswordResetRequestView(APIView):
         if user:
             uid = urlsafe_base64_encode(force_bytes(user.pk))
             token = default_token_generator.make_token(user)
-            reset_url = f"http://localhost:3000/reset-password?uid={uid}&token={token}"
+            # reset_url = f"http://localhost:3000/reset-password?uid={uid}&token={token}"
+            reset_url = f"https://loop-back-two.vercel.app/reset-password?uid={uid}&token={token}"
 
             try:
                 send_mail(
