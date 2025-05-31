@@ -1,6 +1,6 @@
 from django.urls import path, include
 # from rest_framework.authtoken.views import obtain_auth_token
-from users.views import CustomTokenView, RegisterView, VerifyEmailView, PasswordResetRequestView, PasswordResetConfirmView, CustomGoogleLoginView
+from users.views import CustomTokenView, RegisterView, ResendVerificationEmailView, VerifyEmailView, PasswordResetRequestView, PasswordResetConfirmView, CustomGoogleLoginView
 from matchrequest.views import MatchRequestView, MatchResponseView
 from mentorship.views import MentorshipLoopViewSet, DashboardView
 from weeklycheckin.views import WeeklyCheckInCreateView
@@ -32,6 +32,7 @@ urlpatterns = [
 
     # USER ONBOARDING
     path('register/', RegisterView.as_view(), name='register'),
+    path('resend-verification/', ResendVerificationEmailView.as_view(), name='resend-verification'),
     path('verify-email/<uidb64>/<token>/', VerifyEmailView.as_view(), name='verify-email'),
     path('login/', CustomTokenView.as_view(), name='token_obtain_login'),
     path('token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),

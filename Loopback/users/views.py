@@ -52,7 +52,31 @@ class RegisterView(APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
+class ResendVerificationEmailView(APIView):
+    def post(self, request):
+        email = request.data.get("email")
+        try:
+            user = User.objects.get(email=email)
+        except User.DoesNotExist:
+            return Response({'error': 'User not found.'}, status=status.HTTP_404_NOT_FOUND)
 
+        if user.verified:
+            return Response({'message': 'Email already verified.'}, status=status.HTTP_400_BAD_REQUEST)
+
+        # Generate a fresh token and UID
+        token = default_token_generator.make_token(user)
+        uid = urlsafe_base64_encode(force_bytes(user.pk))
+        verify_url = f"http://loopback-f6mg.onrender.com/api/auth/verify-email/{uid}/{token}/"
+
+        # Send the email
+        send_mail(
+            subject="Resend: Verify your Email",
+            message=f"Click the link to verify your account: {verify_url}",
+            from_email=settings.DEFAULT_FROM_EMAIL,
+            recipient_list=[user.email]
+        )
+
+        return Response({'message': 'Verification email resent!'}, status=status.HTTP_200_OK)
 
 
 # Verification of Email
