@@ -17,6 +17,7 @@ from django.utils.encoding import force_bytes
 from django.contrib.auth.hashers import make_password
 from allauth.socialaccount.providers.google.views import GoogleOAuth2Adapter
 from dj_rest_auth.registration.views import SocialLoginView
+from allauth.socialaccount.models import SocialAccount
 from django.http import HttpResponseRedirect
 
 # Create your views here.
@@ -135,20 +136,52 @@ class CustomTokenView(TokenObtainPairView):
 
 
 
-# Google Social Register/login view
+
+
+
 class CustomGoogleLoginView(SocialLoginView):
     adapter_class = GoogleOAuth2Adapter
 
     def post(self, request, *args, **kwargs):
-        response = super().post(request, *args, **kwargs)
+        # Extract the token from the request
+        access_token = request.data.get("access_token")
 
-        # token = response.data.get("access_token")
-        user = self.request.user
-        # if user.is_authenticated and not user.role:
-        if user.is_authenticated and not getattr(user, 'role', None):
-            # Redirect to frontend with user ID for role selection
-            redirect_url = f"https://loop-back-two.vercel.app/user-role?user_id={user.id}"
-            return HttpResponseRedirect(redirect_url)
+        if not access_token:
+            return Response({"error": "Access token is required"}, status=status.HTTP_400_BAD_REQUEST)
+        response = super().post(request, *args, **kwargs)
+        # At this point, self.request.user is the logged-in user from Google
+        google_user = self.request.user
+        # Get Google email from the social login response
+        email = google_user.email if google_user and google_user.email else None
+
+        if email:
+            try:
+                existing_user = User.objects.get(email=email)
+
+                if existing_user.verified and existing_user.role:
+                    if not SocialAccount.objects.filter(user=existing_user).exists():
+                        social_account = SocialAccount.objects.filter(user=google_user).first()
+                        if social_account:
+                            social_account.user = existing_user
+                            social_account.save()
+                    # Force login of the existing user
+                    self.request.user = existing_user
+                    # If verified and role exists, my frontend will handle login redirect
+                    return Response({
+                        "detail": "Login successful.",
+                        "user_id": existing_user.id,
+                        "email": existing_user.email
+                    }, status=status.HTTP_200_OK)
+
+                elif existing_user.verified and not existing_user.role:
+                    # Redirect to role selection if no role
+                    return HttpResponseRedirect(
+                        f"https://loop-back-two.vercel.app/user-role?user_id={existing_user.id}"
+                    )
+
+            except User.DoesNotExist:
+                #Google OAuth2 flow continue (new user will be created)
+                pass
 
         return response
 
