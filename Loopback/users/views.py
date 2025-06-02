@@ -251,39 +251,44 @@ class CustomTokenView(TokenObtainPairView):
 #         response = super().post(request, *args, **kwargs)
 #         return response
 
-
+from allauth.socialaccount.helpers import complete_social_login
+from allauth.socialaccount import requests
 
 class CustomGoogleLoginView(SocialLoginView):
     adapter_class = GoogleOAuth2Adapter
 
     def post(self, request, *args, **kwargs):
-        # Ensure access token is provided
         access_token = request.data.get("access_token")
         if not access_token:
             return Response({"error": "Access token is required"}, status=status.HTTP_400_BAD_REQUEST)
 
-        # Proceed with the normal social login flow
-        response = super().post(request, *args, **kwargs)
+        # Prepare the adapter and client
+        adapter = self.adapter_class()
+        app = adapter.get_provider().get_app(self.request)
+        token = adapter.parse_token({'access_token': access_token})
+        token.app = app
 
-        # Google user (created or fetched by allauth)
-        google_user = self.request.user
-        if not google_user or not google_user.email:
-            return Response({"error": "Google account could not be authenticated."}, status=status.HTTP_400_BAD_REQUEST)
-
+        # Get Google user info using the access token
         try:
-            existing_user = User.objects.get(email=google_user.email)
+            login = adapter.complete_login(self.request, app, token, response=requests.Response())
+            login.token = token
+            login.state = SocialLoginView.serializer_class().validate(request.data)
+            login.lookup()
+        except Exception as e:
+            return Response({"error": "Failed to complete Google login."}, status=status.HTTP_400_BAD_REQUEST)
+
+        # Get the Google email
+        google_email = login.account.extra_data.get("email")
+        if not google_email:
+            return Response({"error": "Unable to retrieve email from Google account"}, status=status.HTTP_400_BAD_REQUEST)
+
+        # Try to match to an existing local user
+        try:
+            existing_user = User.objects.get(email=google_email)
 
             if existing_user.verified and existing_user.role:
-                # Link social account if not already linked
-                if not SocialAccount.objects.filter(user=existing_user).exists():
-                    social_account = SocialAccount.objects.filter(user=google_user).first()
-                    if social_account:
-                        social_account.user = existing_user
-                        social_account.save()
-
-                # Replace the auto-created social user with the existing verified one
-                self.request.user = existing_user
-
+                login.user = existing_user
+                complete_social_login(self.request, login)
                 return Response({
                     "detail": "Login successful.",
                     "user_id": existing_user.id,
@@ -291,15 +296,18 @@ class CustomGoogleLoginView(SocialLoginView):
                 }, status=status.HTTP_200_OK)
 
             elif existing_user.verified and not existing_user.role:
+                login.user = existing_user
+                complete_social_login(self.request, login)
                 return HttpResponseRedirect(
                     f"https://loop-back-two.vercel.app/user-role?user_id={existing_user.id}"
                 )
 
         except User.DoesNotExist:
-            # Continue with the response from super().post()
+            # No existing user → proceed to register new Google user
             pass
 
-        return response
+        # If no matching user, fallback to default handling (creates new user)
+        return super().post(request, *args, **kwargs)
 
 # Password Reset Request View
 class PasswordResetRequestView(APIView):
