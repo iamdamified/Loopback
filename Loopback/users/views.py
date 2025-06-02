@@ -203,52 +203,102 @@ class CustomTokenView(TokenObtainPairView):
 #         return response
 
 
+# class CustomGoogleLoginView(SocialLoginView):
+#     adapter_class = GoogleOAuth2Adapter
+
+#     def post(self, request, *args, **kwargs):
+#         access_token = request.data.get("access_token")
+#         if not access_token:
+#             return Response({"error": "Access token is required"}, status=status.HTTP_400_BAD_REQUEST)
+#         # Temporarily complete the login without saving
+#         try:
+#             # Stimulate the social login process
+#             login = self.adapter_class().complete_login(self.request, None)
+#             login.token = access_token
+#             login.state = SocialLoginView.serializer_class().validate(request.data)
+#             email = login.account.extra_data.get("email")
+#         except Exception:
+#             return Response({"error": "Invalid Google login attempt."}, status=status.HTTP_400_BAD_REQUEST)
+
+#         if email:
+#             try:
+#                 existing_user = User.objects.get(email=email)
+
+#                 if existing_user.verified and existing_user.role:
+#                     # Check if social account already exists
+#                     if not SocialAccount.objects.filter(user=existing_user).exists():
+#                         # Create a new SocialAccount and link it
+#                         login.user = existing_user
+#                         login.save(request, connect=True)
+#                     self.request.user = existing_user
+
+#                     return Response({
+#                         "detail": "Login successful.",
+#                         "user_id": existing_user.id,
+#                         "email": existing_user.email
+#                     }, status=status.HTTP_200_OK)
+
+#                 elif existing_user.verified and not existing_user.role:
+#                     return HttpResponseRedirect(
+#                         f"https://loop-back-two.vercel.app/user-role?user_id={existing_user.id}"
+#                     )
+
+#             except User.DoesNotExist:
+#                 # Proceed with the default flow for new users
+#                 pass
+
+#         # Fall back to default Google login flow
+#         response = super().post(request, *args, **kwargs)
+#         return response
+
+
+
 class CustomGoogleLoginView(SocialLoginView):
     adapter_class = GoogleOAuth2Adapter
 
     def post(self, request, *args, **kwargs):
+        # Ensure access token is provided
         access_token = request.data.get("access_token")
         if not access_token:
             return Response({"error": "Access token is required"}, status=status.HTTP_400_BAD_REQUEST)
-        # Temporarily complete the login without saving
-        try:
-            # Stimulate the social login process
-            login = self.adapter_class().complete_login(self.request, None)
-            login.token = access_token
-            login.state = SocialLoginView.serializer_class().validate(request.data)
-            email = login.account.extra_data.get("email")
-        except Exception:
-            return Response({"error": "Invalid Google login attempt."}, status=status.HTTP_400_BAD_REQUEST)
 
-        if email:
-            try:
-                existing_user = User.objects.get(email=email)
-
-                if existing_user.verified and existing_user.role:
-                    # Check if social account already exists
-                    if not SocialAccount.objects.filter(user=existing_user).exists():
-                        # Create a new SocialAccount and link it
-                        login.user = existing_user
-                        login.save(request, connect=True)
-                    self.request.user = existing_user
-
-                    return Response({
-                        "detail": "Login successful.",
-                        "user_id": existing_user.id,
-                        "email": existing_user.email
-                    }, status=status.HTTP_200_OK)
-
-                elif existing_user.verified and not existing_user.role:
-                    return HttpResponseRedirect(
-                        f"https://loop-back-two.vercel.app/user-role?user_id={existing_user.id}"
-                    )
-
-            except User.DoesNotExist:
-                # Proceed with the default flow for new users
-                pass
-
-        # Fall back to default Google login flow
+        # Proceed with the normal social login flow
         response = super().post(request, *args, **kwargs)
+
+        # Google user (created or fetched by allauth)
+        google_user = self.request.user
+        if not google_user or not google_user.email:
+            return Response({"error": "Google account could not be authenticated."}, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            existing_user = User.objects.get(email=google_user.email)
+
+            if existing_user.verified and existing_user.role:
+                # Link social account if not already linked
+                if not SocialAccount.objects.filter(user=existing_user).exists():
+                    social_account = SocialAccount.objects.filter(user=google_user).first()
+                    if social_account:
+                        social_account.user = existing_user
+                        social_account.save()
+
+                # Replace the auto-created social user with the existing verified one
+                self.request.user = existing_user
+
+                return Response({
+                    "detail": "Login successful.",
+                    "user_id": existing_user.id,
+                    "email": existing_user.email
+                }, status=status.HTTP_200_OK)
+
+            elif existing_user.verified and not existing_user.role:
+                return HttpResponseRedirect(
+                    f"https://loop-back-two.vercel.app/user-role?user_id={existing_user.id}"
+                )
+
+        except User.DoesNotExist:
+            # Continue with the response from super().post()
+            pass
+
         return response
 
 # Password Reset Request View
