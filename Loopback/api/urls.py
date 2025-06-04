@@ -1,11 +1,11 @@
 from django.urls import path, include
 # from rest_framework.authtoken.views import obtain_auth_token
 from users.views import CustomTokenView, RegisterView, ResendVerificationEmailView, VerifyEmailView, PasswordResetRequestView, PasswordResetConfirmView, CustomGoogleLoginView
-from matchrequest.views import MatchRequestView, MatchResponseView
+from matchrequest.views import MatchRequestView, MatchResponseView, MentorMatchesRequestsView, MenteeMatchesRequestsView
 from mentorship.views import MentorshipLoopViewSet, DashboardView
 from weeklycheckin.views import WeeklyCheckInCreateView
 from feedback.views import SubmitFeedbackView
-from profiles.views import MentorProfileDetailView, MenteeProfileDetailView
+from profiles.views import MentorProfileDetailView, MenteeProfileDetailView, AllMentorsListView, SuggestedMentorsListView, AllMenteesListView, MenteeDetailView, MentorDetailView
 from rest_framework_simplejwt.views import TokenRefreshView
 from rest_framework.routers import DefaultRouter
 
@@ -18,12 +18,6 @@ router.register(r'loops', MentorshipLoopViewSet, basename='mentorshiploop')
 # PUT/PATCH  /loops/<id>/
 # POST/DEACTIVATE  /loops/<id>/deactivate/
 
-
-# router.register(r'loops', MentorshipViewSet, basename='loops')
-# router.register(r'goals', GoalViewSet, basename='goals')
-# router.register('checkins/', WeeklycheckinViewSet, basename='checkins')
-# router.register('loop-feedbacks/', LoopFeedbackViewSet, basename='loop-feedbacks')
-# router.register(r'match-requests', MatchRequestViewSet, basename='match-requests')
     
 
 urlpatterns = router.urls
@@ -41,15 +35,24 @@ urlpatterns = [
     path('auth/google/', CustomGoogleLoginView.as_view(), name='google_login'), # Google register/login
 
     
-    # User Profiles
+    # User Profile Management and Listing, and Detail Views
     path('mentor/profile/', MentorProfileDetailView.as_view(), name='mentor-profile'),
     path('mentee/profile/', MenteeProfileDetailView.as_view(), name='mentee-profile'),
+    path('all/mentors/', AllMentorsListView.as_view(), name='all-mentors'),
+    path('mentor/detail/<int:id>/', MentorDetailView.as_view(), name='mentor-detail'),
+    path('all/mentees/', AllMenteesListView.as_view(), name='all-mentees'),
+    path('mentee/detail/<int:id>/', MenteeDetailView.as_view(), name='mentor-detail'),
+    
 
 
-
-    # Mentee Match Request and Mentor Response
-    path("match-request/<int:pk>/request/", MatchRequestView.as_view(), name="match-request"),
-    path("match-response/<int:pk>/decision/", MatchResponseView.as_view(), name="match-response"),
+    # MATCHING SYSTEM
+    # Mentee Match Request and Mentor Response, and Records
+    path("suggested-mentors/", SuggestedMentorsListView.as_view(), name="suggested-mentors"),
+    path("match-request/", MatchRequestView.as_view(), name="match-request"),
+    path("match-response/<match_request_id>/", MatchResponseView.as_view(), name="match-response"),
+    path('match-requests/mentors/', MentorMatchesRequestsView.as_view(), name='mentor-match-requests'),
+    path('match-requests/mentees/', MenteeMatchesRequestsView.as_view(), name='mentee-match-requests'),
+    # path('meeting-schedule/', MeetingScheduleView.as_view(), name='mentee-mentor-meeting'),
 
     # MENTORSHIP
     path("weekly-checkin/", WeeklyCheckInCreateView.as_view(), name="weekly-checkin"),

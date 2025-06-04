@@ -37,7 +37,6 @@ class MentorProfileSerializer(serializers.ModelSerializer):
 
 
 
-
 # Mentee Profile Serializer
 class MenteeProfileSerializer(serializers.ModelSerializer):
     first_name = serializers.CharField(source='user.first_name', required=False)
@@ -66,3 +65,31 @@ class MenteeProfileSerializer(serializers.ModelSerializer):
         instance.save()
 
         return instance
+
+
+class MenteeSummarySerializer(serializers.ModelSerializer):
+    full_name = serializers.SerializerMethodField()
+
+    class Meta:
+        model = MenteeProfile
+        fields = ['id', 'passport_image', 'full_name', 'interests', 'goals']
+
+    def get_full_name(self, obj):
+        return f"{obj.user.first_name} {obj.user.last_name}"
+
+
+class MentorSummarySerializer(serializers.ModelSerializer):
+    full_name = serializers.SerializerMethodField()
+
+    class Meta:
+        model = MentorProfile
+        fields = ['id', 'passport_image', 'full_name', 'interests', 'goals']
+
+    def get_full_name(self, obj):
+        return f"{obj.user.first_name} {obj.user.last_name}"
+    
+
+
+class SuggestedMentorsSerializer(serializers.Serializer):
+    mentor = MentorSummarySerializer()
+    score = serializers.IntegerField()

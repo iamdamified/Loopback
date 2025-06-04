@@ -17,7 +17,6 @@ from django.utils.encoding import force_bytes
 from django.contrib.auth.hashers import make_password
 from allauth.socialaccount.providers.google.views import GoogleOAuth2Adapter
 from dj_rest_auth.registration.views import SocialLoginView
-from allauth.socialaccount.models import SocialAccount
 from django.http import HttpResponseRedirect
 
 # Create your views here.
@@ -53,6 +52,9 @@ class RegisterView(APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
+
+# RESEND VERIFICATION EMAIL
+
 class ResendVerificationEmailView(APIView):
     def post(self, request):
         email = request.data.get("email")
@@ -80,7 +82,9 @@ class ResendVerificationEmailView(APIView):
         return Response({'message': 'Verification email resent!'}, status=status.HTTP_200_OK)
 
 
-# Verification of Email
+
+
+# Verification/Confirmation of Email
 
 class VerifyEmailView(APIView):
     def get(self, request, uidb64, token):
@@ -153,106 +157,9 @@ class CustomTokenView(TokenObtainPairView):
 
 #         return response
 
-
-
-
-# class CustomGoogleLoginView(SocialLoginView):
-#     adapter_class = GoogleOAuth2Adapter
-
-#     def post(self, request, *args, **kwargs):
-#         # Extract the token from the request
-#         access_token = request.data.get("access_token")
-
-#         if not access_token:
-#             return Response({"error": "Access token is required"}, status=status.HTTP_400_BAD_REQUEST)
-#         response = super().post(request, *args, **kwargs)
-#         # At this point, self.request.user is the logged-in user from Google
-#         google_user = self.request.user
-#         # Get Google email from the social login response
-#         email = google_user.email if google_user and google_user.email else None
-
-#         if email:
-#             try:
-#                 existing_user = User.objects.get(email=email)
-
-#                 if existing_user.verified and existing_user.role:
-#                     if not SocialAccount.objects.filter(user=existing_user).exists():
-#                         social_account = SocialAccount.objects.filter(user=google_user).first()
-#                         if social_account:
-#                             social_account.user = existing_user
-#                             social_account.save()
-#                     # Force login of the existing user
-#                     self.request.user = existing_user
-#                     # If verified and role exists, my frontend will handle login redirect
-#                     return Response({
-#                         "detail": "Login successful.",
-#                         "user_id": existing_user.id,
-#                         "email": existing_user.email
-#                     }, status=status.HTTP_200_OK)
-
-#                 elif existing_user.verified and not existing_user.role:
-#                     # Redirect to role selection if no role
-#                     return HttpResponseRedirect(
-#                         f"https://loop-back-two.vercel.app/user-role?user_id={existing_user.id}"
-#                     )
-
-#             except User.DoesNotExist:
-#                 #Google OAuth2 flow continue (new user will be created)
-#                 pass
-
-#         return response
-
-
-# class CustomGoogleLoginView(SocialLoginView):
-#     adapter_class = GoogleOAuth2Adapter
-
-#     def post(self, request, *args, **kwargs):
-#         access_token = request.data.get("access_token")
-#         if not access_token:
-#             return Response({"error": "Access token is required"}, status=status.HTTP_400_BAD_REQUEST)
-#         # Temporarily complete the login without saving
-#         try:
-#             # Stimulate the social login process
-#             login = self.adapter_class().complete_login(self.request, None)
-#             login.token = access_token
-#             login.state = SocialLoginView.serializer_class().validate(request.data)
-#             email = login.account.extra_data.get("email")
-#         except Exception:
-#             return Response({"error": "Invalid Google login attempt."}, status=status.HTTP_400_BAD_REQUEST)
-
-#         if email:
-#             try:
-#                 existing_user = User.objects.get(email=email)
-
-#                 if existing_user.verified and existing_user.role:
-#                     # Check if social account already exists
-#                     if not SocialAccount.objects.filter(user=existing_user).exists():
-#                         # Create a new SocialAccount and link it
-#                         login.user = existing_user
-#                         login.save(request, connect=True)
-#                     self.request.user = existing_user
-
-#                     return Response({
-#                         "detail": "Login successful.",
-#                         "user_id": existing_user.id,
-#                         "email": existing_user.email
-#                     }, status=status.HTTP_200_OK)
-
-#                 elif existing_user.verified and not existing_user.role:
-#                     return HttpResponseRedirect(
-#                         f"https://loop-back-two.vercel.app/user-role?user_id={existing_user.id}"
-#                     )
-
-#             except User.DoesNotExist:
-#                 # Proceed with the default flow for new users
-#                 pass
-
-#         # Fall back to default Google login flow
-#         response = super().post(request, *args, **kwargs)
-#         return response
-
+# GOOGLE SOCIAL OAUTH2 LOGIN THAT WORKS FOR ALL SITUATION(ROBOST AND HANDLES EXISTING USERS)
 from allauth.socialaccount.helpers import complete_social_login
-from allauth.socialaccount import requests
+import requests
 
 class CustomGoogleLoginView(SocialLoginView):
     adapter_class = GoogleOAuth2Adapter
@@ -308,6 +215,8 @@ class CustomGoogleLoginView(SocialLoginView):
 
         # If no matching user, fallback to default handling (creates new user)
         return super().post(request, *args, **kwargs)
+    
+
 
 # Password Reset Request View
 class PasswordResetRequestView(APIView):
@@ -368,100 +277,3 @@ class PasswordResetConfirmView(APIView):
         return Response({'message': 'Password reset successful'})
         # redirect_url = f"http://localhost:3000/password-success-page?user_id={user.id}" hoping frontend will handle this and ask 
         # return HttpResponseRedirect(redirect_url)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-# class LoginView(APIView):
-#     def post(self, request):
-#         email = request.data.get('email')
-#         password = request.data.get('password')
-#         user = authenticate(email=email, password=password)
-
-#         # Handle invalid credentials
-#         if not user:
-#             return Response({"error": "Invalid credentials"}, status=status.HTTP_401_UNAUTHORIZED)
-
-#         # Handle inactive users
-#         if not user.is_active:
-#             return Response({"error": "Account is inactive"}, status=status.HTTP_403_FORBIDDEN)
-
-#         # Handle missing role
-#         if not hasattr(user, 'role') or not user.role:
-#             return Response({"error": "Please complete your profile by selecting a role."}, status=status.HTTP_403_FORBIDDEN)
-
-#         # Generate tokens
-#         refresh = RefreshToken.for_user(user)
-#         return Response(
-#             {
-#                 "refresh": str(refresh),
-#                 "access": str(refresh.access_token),
-#                 # "username": user.username,
-#                 "first_name": user.first_name,
-#                 "last_name": user.last_name,
-#                 "email": user.email,
-#                 "role": user.role,
-#             },
-#             status=status.HTTP_200_OK
-#         )
-
-
-
-# class CustomTokenView(TokenObtainPairView):
-#     serializer_class = CustomTokenObtainPairSerializer
-
-#     def post(self, request, *args, **kwargs):
-#         # Generate tokens and validate credentials
-#         response = super().post(request, *args, **kwargs)
-
-#         # Now, we can access the authenticated user
-#         token = response.data.get("access")
-#         if token:
-#             access_token = AccessToken(token) # token to get the user
-#             user_id = access_token["user_id"]
-
-#             User = get_user_model()  # Fetch the actual user object
-#             user = User.objects.get(id=user_id)
-
-#             if not user.role: # Check for role
-#                 raise AuthenticationFailed('Please complete your profile by selecting a role.')
-
-#         # return response
-#         return Response(
-#             {
-                
-#                 "access": access_token,
-#                 "refresh": str(RefreshToken.for_user(user)),
-#                 # "username": user.username,
-#                 "first_name": user.first_name,
-#                 "last_name": user.last_name,
-#                 "email": user.email,
-#                 "role": user.role,
-#             },
-#             status=status.HTTP_200_OK
-#         )
