@@ -1,7 +1,7 @@
 from django.urls import path, include
 # from rest_framework.authtoken.views import obtain_auth_token
 from users.views import CustomTokenView, RegisterView, ResendVerificationEmailView, VerifyEmailView, PasswordResetRequestView, PasswordResetConfirmView, CustomGoogleLoginView
-from matchrequest.views import MatchRequestView, MatchResponseView, MentorMatchesRequestsView, MenteeMatchesRequestsView
+from matchrequest.views import MatchRequestView, MatchResponseView, MentorMatchesRequestsView, MenteeMatchesRequestsView, CreateMeetingScheduleView, MentorMeetingScheduleView, MenteeMeetingScheduleView
 from mentorship.views import MentorshipLoopViewSet, DashboardView
 from weeklycheckin.views import WeeklyCheckInCreateView
 from feedback.views import SubmitFeedbackView
@@ -52,7 +52,9 @@ urlpatterns = [
     path("match-response/<match_request_id>/", MatchResponseView.as_view(), name="match-response"),
     path('match-requests/mentors/', MentorMatchesRequestsView.as_view(), name='mentor-match-requests'),
     path('match-requests/mentees/', MenteeMatchesRequestsView.as_view(), name='mentee-match-requests'),
-    # path('meeting-schedule/', MeetingScheduleView.as_view(), name='mentee-mentor-meeting'),
+    path('meeting-schedule/<int:match_request_id>/', CreateMeetingScheduleView.as_view(), name='create-meeting'),
+    path('meeting/mentor/', MentorMeetingScheduleView.as_view(), name='mentor-meetings'),
+    path('meeting/mentee/', MenteeMeetingScheduleView.as_view(), name='mentee-meetings'),
 
     # MENTORSHIP
     path("weekly-checkin/", WeeklyCheckInCreateView.as_view(), name="weekly-checkin"),
