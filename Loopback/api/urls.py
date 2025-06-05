@@ -2,7 +2,7 @@ from django.urls import path, include
 # from rest_framework.authtoken.views import obtain_auth_token
 from users.views import CustomTokenView, RegisterView, ResendVerificationEmailView, VerifyEmailView, PasswordResetRequestView, PasswordResetConfirmView, CustomGoogleLoginView
 from matchrequest.views import MatchRequestView, MatchResponseView, MentorMatchesRequestsView, MenteeMatchesRequestsView, CreateMeetingScheduleView, MentorMeetingScheduleView, MenteeMeetingScheduleView
-from mentorship.views import MentorshipLoopViewSet, DashboardView
+from mentorship.views import CreateMentorshipLoopView
 from weeklycheckin.views import WeeklyCheckInCreateView
 from feedback.views import SubmitFeedbackView
 from profiles.views import MentorProfileDetailView, MenteeProfileDetailView, AllMentorsListView, SuggestedMentorsListView, AllMenteesListView, MenteeDetailView, MentorDetailView
@@ -11,7 +11,7 @@ from rest_framework.routers import DefaultRouter
 
 
 router = DefaultRouter()
-router.register(r'loops', MentorshipLoopViewSet, basename='mentorshiploop')
+# router.register(r'loops', MentorshipLoopViewSet, basename='mentorshiploop')
 # GET /loops/
 # POST /loops/
 # GET  /loops/<id>/
@@ -57,12 +57,13 @@ urlpatterns = [
     path('meeting/mentee/', MenteeMeetingScheduleView.as_view(), name='mentee-meetings'),
 
     # MENTORSHIP
+    path('loops/create/', CreateMentorshipLoopView.as_view(), name='create_mentorship_loop'),
     path("weekly-checkin/", WeeklyCheckInCreateView.as_view(), name="weekly-checkin"),
     path("loop-feedback/", SubmitFeedbackView.as_view(), name="loop-feedback"),
 
 
     # DASHBOARD FROM MENTORSHIP SERIALIZERS AND VIEWS
-    path('dashboard/', DashboardView.as_view(), name='mentorship-dashboard'),
+    # path('dashboard/', DashboardView.as_view(), name='mentorship-dashboard'),
 
 
     # FOR BACKEND
