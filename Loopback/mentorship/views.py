@@ -2,6 +2,8 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from django.shortcuts import get_object_or_404
+from django.core.mail import send_mail
+from django.conf import settings
 from django.utils import timezone
 from datetime import timedelta
 from .models import MentorshipLoop
@@ -66,6 +68,28 @@ class CreateMentorshipLoopView(APIView):
             end_date=end_date,
             status='pending',
             is_active=True
+        )
+
+
+        send_mail(
+            subject='🎉 Your Mentorship Loop Has Been Created!',
+            message=f"""
+        Hi {mentee.user.first_name},
+
+        A new mentorship loop has been initiated by your mentor {mentor.user.first_name} {mentor.user.last_name}.
+
+        📝 Purpose: {purpose or 'No purpose provided'}
+        📅 Start Date: {start_date}
+        📅 End Date: {end_date}
+
+        Please be prepared and make the most of your upcoming sessions!
+
+        Best,
+        The Mentorship Team
+        """.strip(),
+            from_email=settings.DEFAULT_FROM_EMAIL,
+            recipient_list=[mentee.user.email],
+            fail_silently=False  
         )
 
         serializer = MentorshipLoopSerializer(mentorship_loop)
