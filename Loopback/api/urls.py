@@ -2,7 +2,7 @@ from django.urls import path, include
 # from rest_framework.authtoken.views import obtain_auth_token
 from users.views import CustomTokenView, RegisterView, ResendVerificationEmailView, VerifyEmailView, PasswordResetRequestView, PasswordResetConfirmView, CustomGoogleLoginView
 from matchrequest.views import MatchRequestView, MatchResponseView, MentorMatchesRequestsView, MenteeMatchesRequestsView, CreateMeetingScheduleView, MentorMeetingScheduleView, MenteeMeetingScheduleView
-from mentorship.views import CreateMentorshipLoopView
+from mentorship.views import CreateMentorshipLoopView, MentorLoopsListView, MenteeLoopsListView
 from weeklycheckin.views import WeeklyCheckInCreateView
 from feedback.views import SubmitFeedbackView
 from profiles.views import MentorProfileDetailView, MenteeProfileDetailView, AllMentorsListView, SuggestedMentorsListView, AllMenteesListView, MenteeDetailView, MentorDetailView
@@ -58,6 +58,12 @@ urlpatterns = [
 
     # MENTORSHIP
     path('loops/create/', CreateMentorshipLoopView.as_view(), name='create_mentorship_loop'),
+    path('loops/mentor/', MentorLoopsListView.as_view(), name='mentor-loops'),
+    path('loops/mentee/', MenteeLoopsListView.as_view(), name='mentee-loops'),
+    # http://127.0.0.1:8000/api/auth/loops/mentee/?status=ongoing
+    
+
+    # Weekly Checkins
     path("weekly-checkin/", WeeklyCheckInCreateView.as_view(), name="weekly-checkin"),
     path("loop-feedback/", SubmitFeedbackView.as_view(), name="loop-feedback"),
 

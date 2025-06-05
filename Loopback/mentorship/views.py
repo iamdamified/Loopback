@@ -70,7 +70,7 @@ class CreateMentorshipLoopView(APIView):
             is_active=True
         )
 
-
+        # Send Email Notification to Mentee about the new loop created
         send_mail(
             subject='🎉 Your Mentorship Loop Has Been Created!',
             message=f"""
@@ -95,53 +95,37 @@ class CreateMentorshipLoopView(APIView):
         serializer = MentorshipLoopSerializer(mentorship_loop)
         return Response(serializer.data, status=201)
 
-# class MentorshipLoopViewSet(viewsets.ModelViewSet):
-#     queryset = MentorshipLoop.objects.all()
-#     serializer_class = MentorshipLoopSerializer
-#     permission_classes = [permissions.IsAuthenticated]
 
-#     def get_queryset(self):
-#         user = self.request.user
-#         if hasattr(user, 'mentor_profile'):
-#             return MentorshipLoop.objects.filter(mentor=user.mentor_profile)
-#         elif hasattr(user, 'mentee_profile'):
-#             return MentorshipLoop.objects.filter(mentee=user.mentee_profile)
-#         return MentorshipLoop.objects.none()
 
-#     def perform_create(self, serializer):
-#         mentor = serializer.validated_data['mentor']
-#         mentee = serializer.validated_data['mentee']
-        
-#         # Prevent multiple active loops between the same mentor and mentee
-#         if MentorshipLoop.objects.filter(mentor=mentor, mentee=mentee, is_active=True).exists():
-#             raise serializers.ValidationError("An active mentorship loop already exists between this mentor and mentee.")
+class MentorLoopsListView(APIView):
+    permission_classes = [IsAuthenticated]
 
-#         serializer.save()
+    def get(self, request):
+        mentor = get_object_or_404(MentorProfile, user=request.user)
+        status = request.query_params.get("status")  # optional filter
 
-#     @action(detail=True, methods=['post'], url_path='deactivate')
-#     def deactivate_loop(self, request, pk=None):
-#         loop = self.get_object()
-#         loop.is_active = False
-#         loop.save()
-#         return Response({'detail': 'Loop deactivated.'}, status=status.HTTP_200_OK)
+        loops = MentorshipLoop.objects.filter(mentor=mentor)
+        if status in ['pending', 'ongoing', 'completed']:
+            loops = loops.filter(status=status)
 
-#     @action(detail=False, methods=['post'], url_path='auto-create')
-#     def auto_create_from_match(self, request):
-#         match_id = request.data.get('match_id')
-#         match = get_object_or_404(MatchRequest, id=match_id, status='accepted')
-
-#         # Prevent duplicates
-#         if MentorshipLoop.objects.filter(mentor=match.mentor, mentee=match.mentee, is_active=True).exists():
-#             return Response({"detail": "An active loop already exists for this match."}, status=status.HTTP_400_BAD_REQUEST)
-
-#         loop = MentorshipLoop.objects.create(mentor=match.mentor, mentee=match.mentee)
-#         serializer = self.get_serializer(loop)
-#         return Response(serializer.data, status=status.HTTP_201_CREATED)
+        serializer = MentorshipLoopSerializer(loops, many=True)
+        return Response(serializer.data, status=200)
 
 
 
+class MenteeLoopsListView(APIView):
+    permission_classes = [IsAuthenticated]
 
+    def get(self, request):
+        mentee = get_object_or_404(MenteeProfile, user=request.user)
+        status = request.query_params.get("status")  # optional filter
 
+        loops = MentorshipLoop.objects.filter(mentee=mentee)
+        if status in ['pending', 'ongoing', 'completed']:
+            loops = loops.filter(status=status)
+
+        serializer = MentorshipLoopSerializer(loops, many=True)
+        return Response(serializer.data, status=200)
 
 # MENTORSHIP USERS FRONTEND DASHBOARD VIEWS (I WILL CREATE A SEPARATE APP FOR THIS AFTER MOVING FILES)
 
