@@ -1,7 +1,7 @@
 from rest_framework import serializers
 from django.contrib.auth import get_user_model
 from .models import MentorProfile, MenteeProfile
-from users.serializers import UserRegistrationSerializer
+from users.serializers import UserRegistrationSerializer, download_image_from_url
 
 User = get_user_model()
 
@@ -14,13 +14,25 @@ class MentorProfileSerializer(serializers.ModelSerializer):
     class Meta:
         model = MentorProfile
         fields = [
-            'id', 'passport_image', 'first_name', 'last_name',
+            'id', 'passport_image', 'passport_image_url', 'first_name', 'last_name',
             'company', 'job_title', 'industry', 'bio', 'interests', 'goals',
             'skills', 'experience_years', 'linkedin', 'website', 'X_account'
         ]
 
     def update(self, instance, validated_data):
         user_data = validated_data.pop('user', {})
+
+        # Handle image logic
+        passport_image = validated_data.pop('passport_image', None)
+        passport_image_url = validated_data.pop('passport_image_url', None)
+
+        if not passport_image and passport_image_url:
+            downloaded_image = download_image_from_url(passport_image_url)
+            if downloaded_image:
+                instance.passport_image = downloaded_image
+
+        elif passport_image:
+            instance.passport_image = passport_image
 
         # Update user fields
         user = instance.user
@@ -45,13 +57,25 @@ class MenteeProfileSerializer(serializers.ModelSerializer):
     class Meta:
         model = MenteeProfile
         fields = [
-            'id', 'passport_image', 'first_name', 'last_name',
+            'id', 'passport_image', 'passport_image_url', 'first_name', 'last_name',
             'company', 'job_title', 'industry', 'bio', 'interests', 'goals',
             'skills', 'experience_years', 'linkedin', 'website', 'X_account'
         ]
 
     def update(self, instance, validated_data):
         user_data = validated_data.pop('user', {})
+
+        # Handle image logic
+        passport_image = validated_data.pop('passport_image', None)
+        passport_image_url = validated_data.pop('passport_image_url', None)
+
+        if not passport_image and passport_image_url:
+            downloaded_image = download_image_from_url(passport_image_url)
+            if downloaded_image:
+                instance.passport_image = downloaded_image
+
+        elif passport_image:
+            instance.passport_image = passport_image
 
         # Update user fields
         user = instance.user

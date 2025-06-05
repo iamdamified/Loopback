@@ -5,8 +5,21 @@ from profiles.models import MentorProfile, MenteeProfile
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from django.contrib.auth import get_user_model
 from dj_rest_auth.registration.serializers import RegisterSerializer
+import requests
+from django.core.files.base import ContentFile
+from urllib.parse import urlparse
 
 User = get_user_model()
+
+def download_image_from_url(url):
+    try:
+        response = requests.get(url)
+        if response.status_code == 200:
+            filename = urlparse(url).path.split('/')[-1] or 'image.jpg'
+            return ContentFile(response.content, name=filename)
+    except Exception:
+        pass
+    return None
 
 # This serialiszer is used to manage role-based access control and attributes based control to profile models from user registration.
 class UserRegistrationSerializer(serializers.ModelSerializer):
@@ -15,8 +28,11 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
     first_name = serializers.CharField()
     last_name = serializers.CharField()
 
-    # Extended profile fields
+    # Support both file and URL
     passport_image = serializers.ImageField(required=False, allow_null=True)
+    passport_image_url = serializers.URLField(required=False, allow_blank=True, allow_null=True)
+
+    # Extended profile fields
     company = serializers.CharField(required=False, allow_blank=True)
     job_title = serializers.CharField(required=False, allow_blank=True)
     industry = serializers.CharField(required=False, allow_blank=True)
@@ -34,7 +50,7 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
         model = User
         fields = [
             'email', 'password', 'first_name', 'last_name', 'role',
-            'passport_image', 'company', 'job_title', 'industry', 'bio',
+            'passport_image', 'passport_image_url', 'company', 'job_title', 'industry', 'bio',
             'interests', 'goals', 'skills', 'experience_years', 'linkedin',
             'website', 'X_account', 'expertise'
         ]
@@ -42,6 +58,13 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         role = validated_data.pop('role')
         password = validated_data.pop('password')
+
+        passport_image = validated_data.pop('passport_image', None)
+        passport_image_url = validated_data.pop('passport_image_url', None)
+
+        # Use uploaded file first, fallback to image URL
+        if not passport_image and passport_image_url:
+            passport_image = download_image_from_url(passport_image_url)
 
         # Extract shared profile fields
         profile_fields = {
