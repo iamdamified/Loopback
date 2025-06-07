@@ -4,7 +4,7 @@ from users.views import CustomTokenView, RegisterView, ResendVerificationEmailVi
 from matchrequest.views import MatchRequestView, MatchResponseView, MentorMatchesRequestsView, MenteeMatchesRequestsView, CreateMeetingScheduleView, MentorMeetingScheduleView, MenteeMeetingScheduleView
 from mentorship.views import CreateMentorshipLoopView, MentorLoopsListView, MenteeLoopsListView
 from weeklycheckin.views import WeeklyCheckInListCreateView, WeeklyCheckInUpdateView
-from feedback.views import SubmitFeedbackView
+from feedback.views import SubmitFeedbackView, UserFeedbackListView, AllFeedbackListView
 from profiles.views import MentorProfileDetailView, MenteeProfileDetailView, AllMentorsListView, SuggestedMentorsListView, AllMenteesListView, MenteeDetailView, MentorDetailView
 from rest_framework_simplejwt.views import TokenRefreshView
 from rest_framework.routers import DefaultRouter
@@ -53,6 +53,9 @@ urlpatterns = [
     path('match-requests/mentors/', MentorMatchesRequestsView.as_view(), name='mentor-match-requests'),
     path('match-requests/mentees/', MenteeMatchesRequestsView.as_view(), name='mentee-match-requests'),
     path('meeting-schedule/<int:match_request_id>/', CreateMeetingScheduleView.as_view(), name='create-meeting'),
+
+
+    #Introductory Meeting Schedule
     path('meeting/mentor/', MentorMeetingScheduleView.as_view(), name='mentor-meetings'),
     path('meeting/mentee/', MenteeMeetingScheduleView.as_view(), name='mentee-meetings'),
 
@@ -69,8 +72,10 @@ urlpatterns = [
     path("weekly-checkin/", WeeklyCheckInListCreateView.as_view(), name="weekly-checkin"),
     path("weekly-checkin/<int:pk>/", WeeklyCheckInUpdateView.as_view(), name="weekly-checkin-update"),
 
-    # Weekly Checkins
-    path("loop-feedback/", SubmitFeedbackView.as_view(), name="loop-feedback"),
+    # Mentorship Feedbacks
+    path("mentorship-feedback/", SubmitFeedbackView.as_view(), name="mentorship-feedback"),
+    path('user-feedback/', UserFeedbackListView.as_view(), name='user-feedback-list'),
+    path('all-feedback/', AllFeedbackListView.as_view(), name='all-feedback-list'),
 
 
     # DASHBOARD FROM MENTORSHIP SERIALIZERS AND VIEWS
