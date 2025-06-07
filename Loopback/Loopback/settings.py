@@ -335,19 +335,17 @@ INSTALLED_APPS += ['django_celery_beat']
 
 
 # TASKS SCHEDULE
+
 from celery.schedules import crontab
 
 CELERY_BEAT_SCHEDULE = {
-    'weekly-checkin-reminder': {
-        'task': 'api.tasks.weekly_checkin_reminder',
-        'schedule': crontab(day_of_week='sunday', hour=9, minute=0),
+    'send_checkin_reminders_daily': {
+        'task': 'api.tasks.send_all_checkin_reminders',
+        'schedule': crontab(hour=8, minute=0),  # Every day at 8:00 AM
     },
-    'loop-feedback-reminder': {
-        'task': 'api.tasks.loop_feedback_reminder',
-        'schedule': crontab(hour=8, minute=0),
+    'send_loop_completion_reminders_daily': {
+        'task': 'api.tasks.send_all_loop_completion_emails',
+        'schedule': crontab(hour=9, minute=0),  # Every day at 9:00 AM
     },
-    # 'run-auto-matching-every-day': {
-    #     'task': 'mentorship.tasks.run_auto_matching',
-    #     'schedule': crontab(minute=0, hour=1),
-    # },
 }
+

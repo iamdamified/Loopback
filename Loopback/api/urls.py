@@ -3,7 +3,7 @@ from django.urls import path, include
 from users.views import CustomTokenView, RegisterView, ResendVerificationEmailView, VerifyEmailView, PasswordResetRequestView, PasswordResetConfirmView, CustomGoogleLoginView
 from matchrequest.views import MatchRequestView, MatchResponseView, MentorMatchesRequestsView, MenteeMatchesRequestsView, CreateMeetingScheduleView, MentorMeetingScheduleView, MenteeMeetingScheduleView
 from mentorship.views import CreateMentorshipLoopView, MentorLoopsListView, MenteeLoopsListView
-from weeklycheckin.views import WeeklyCheckInCreateView
+from weeklycheckin.views import WeeklyCheckInListCreateView, WeeklyCheckInUpdateView
 from feedback.views import SubmitFeedbackView
 from profiles.views import MentorProfileDetailView, MenteeProfileDetailView, AllMentorsListView, SuggestedMentorsListView, AllMenteesListView, MenteeDetailView, MentorDetailView
 from rest_framework_simplejwt.views import TokenRefreshView
@@ -60,11 +60,16 @@ urlpatterns = [
     path('loops/create/', CreateMentorshipLoopView.as_view(), name='create_mentorship_loop'),
     path('loops/mentor/', MentorLoopsListView.as_view(), name='mentor-loops'),
     path('loops/mentee/', MenteeLoopsListView.as_view(), name='mentee-loops'),
-    # http://127.0.0.1:8000/api/auth/loops/mentee/?status=ongoing
+    # /?status=ongoing
+    # /?status=completed
+    # /?status=pending
     
 
     # Weekly Checkins
-    path("weekly-checkin/", WeeklyCheckInCreateView.as_view(), name="weekly-checkin"),
+    path("weekly-checkin/", WeeklyCheckInListCreateView.as_view(), name="weekly-checkin"),
+    path("weekly-checkin/<int:pk>/", WeeklyCheckInUpdateView.as_view(), name="weekly-checkin-update"),
+
+    # Weekly Checkins
     path("loop-feedback/", SubmitFeedbackView.as_view(), name="loop-feedback"),
 
 
