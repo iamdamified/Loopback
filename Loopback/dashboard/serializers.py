@@ -37,3 +37,25 @@ class MenteeDashboardSerializer(serializers.Serializer):
     last_weekly_goals = MeetingScheduleSerializer(allow_null=True)
     completed_checkins = WeeklyCheckInSerializer(many=True)
     pending_checkins = WeeklyCheckInSerializer(many=True)
+
+    
+
+class MenteeInfoSerializer(serializers.ModelSerializer):
+    first_name = serializers.CharField(source='user.first_name')
+    last_name = serializers.CharField(source='user.last_name')
+
+    class Meta:
+        model = MenteeProfile
+        fields = [
+            'first_name', 'last_name', 'passport_image', 'bio', 'experience_years'
+        ]
+
+
+class MentorDashboardSerializer(serializers.Serializer):
+    first_name = serializers.CharField()
+    last_name = serializers.CharField()
+    current_loop_status = serializers.CharField()
+    mentor = MentorInfoSerializer()
+    last_weekly_goals = MeetingScheduleSerializer(allow_null=True)
+    completed_checkins = WeeklyCheckInSerializer(many=True)
+    pending_checkins = WeeklyCheckInSerializer(many=True)

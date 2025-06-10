@@ -8,7 +8,7 @@ from feedback.views import SubmitFeedbackView, UserFeedbackListView, AllFeedback
 from profiles.views import MentorProfileDetailView, MenteeProfileDetailView, AllMentorsListView, SuggestedMentorsListView, AllMenteesListView, MenteeDetailView, MentorDetailView
 from rest_framework_simplejwt.views import TokenRefreshView
 from rest_framework.routers import DefaultRouter
-from dashboard.views import MenteeDashboardView
+from dashboard.views import MenteeDashboardView, MentorDashboardView
 
 
 router = DefaultRouter()
@@ -81,7 +81,7 @@ urlpatterns = [
 
     # DASHBOARD
     path('mentee/dashboard/', MenteeDashboardView.as_view(), name='mentee-dashboard'),
-    # path('dashboard/', DashboardView.as_view(), name='mentorship-dashboard'),
+    path('mentor/dashboard/', MentorDashboardView.as_view(), name='mentor-dashboard'),
 
 
     # FOR BACKEND
