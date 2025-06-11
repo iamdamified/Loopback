@@ -9,6 +9,7 @@ from profiles.views import MentorProfileDetailView, MenteeProfileDetailView, All
 from rest_framework_simplejwt.views import TokenRefreshView
 from rest_framework.routers import DefaultRouter
 from dashboard.views import MenteeDashboardView, MentorDashboardView
+from dashboard.progress import ProgressHistoryView
 
 
 router = DefaultRouter()
@@ -82,6 +83,9 @@ urlpatterns = [
     # DASHBOARD
     path('mentee/dashboard/', MenteeDashboardView.as_view(), name='mentee-dashboard'),
     path('mentor/dashboard/', MentorDashboardView.as_view(), name='mentor-dashboard'),
+
+    # PROGRESS HISTORY
+    path('progress-history/<int:loop_id>/', ProgressHistoryView.as_view(), name='progress-history'),
 
 
     # FOR BACKEND
