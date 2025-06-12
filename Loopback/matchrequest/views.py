@@ -23,6 +23,7 @@ class MatchRequestView(APIView):
         mentee = MenteeProfile.objects.get(user=request.user)
         mentor_id = request.data.get("mentor_id")
         mentor = get_object_or_404(MentorProfile, id=mentor_id)
+        message = request.data.get("message")
 
         # Abort if the mentee has a pending or accepted match request
         existing_request = MatchRequest.objects.filter(
@@ -42,7 +43,7 @@ class MatchRequestView(APIView):
 
         # Create match request
         match_request, created = MatchRequest.objects.get_or_create(
-            mentor=mentor, mentee=mentee, defaults={"status": "pending"}
+            mentor=mentor, mentee=mentee, message=message, defaults={"status": "pending"}
         )
         if not created:
             return Response({"detail": "Match request already exists."}, status=400)

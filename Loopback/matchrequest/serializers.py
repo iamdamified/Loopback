@@ -4,7 +4,7 @@ from .models import MatchRequest, MeetingSchedule
 class MatchRequestSerializer(serializers.ModelSerializer):
     class Meta:
         model = MatchRequest
-        fields = ['id', 'mentor', 'mentee', 'status', 'created_at']
+        fields = ['id', 'mentor', 'mentee', 'message', 'status', 'created_at']
         read_only_fields = ['status', 'created_at']
 
 

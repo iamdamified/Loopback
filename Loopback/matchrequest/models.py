@@ -6,6 +6,7 @@ from profiles.models import MenteeProfile, MentorProfile
 class MatchRequest(models.Model):
     mentee = models.ForeignKey(MenteeProfile, on_delete=models.CASCADE)
     mentor = models.ForeignKey(MentorProfile, on_delete=models.CASCADE)
+    message = models.TextField(blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
     status = models.CharField(max_length=10, choices=[
         ('pending', 'Pending'),

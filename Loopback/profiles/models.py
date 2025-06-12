@@ -6,6 +6,7 @@ User = get_user_model()
 # Mentor Model
 class MentorProfile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='mentor_profile')
+    username = models.CharField(max_length=255, blank=True, null=True)
     passport_image = models.ImageField(upload_to='passport_images/', blank=True, null=True)
     passport_image_url = models.URLField(blank=True, null=True)
     company = models.CharField(max_length=255, blank=True, null=True)
@@ -34,6 +35,7 @@ class MentorProfile(models.Model):
 # Mentee Model
 class MenteeProfile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='mentee_profile')
+    username = models.CharField(max_length=255, blank=True, null=True)
     passport_image = models.ImageField(upload_to='passport_images/', blank=True, null=True)
     passport_image_url = models.URLField(blank=True, null=True)
     company = models.CharField(max_length=255, blank=True, null=True)

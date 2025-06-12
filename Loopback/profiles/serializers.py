@@ -14,7 +14,7 @@ class MentorProfileSerializer(serializers.ModelSerializer):
     class Meta:
         model = MentorProfile
         fields = [
-            'id', 'passport_image', 'passport_image_url', 'first_name', 'last_name',
+            'id', 'username', 'passport_image', 'passport_image_url', 'first_name', 'last_name',
             'company', 'job_title', 'industry', 'bio', 'interests', 'goals',
             'skills', 'experience_years', 'linkedin', 'website', 'X_account'
         ]
@@ -58,7 +58,7 @@ class MenteeProfileSerializer(serializers.ModelSerializer):
     class Meta:
         model = MenteeProfile
         fields = [
-            'id', 'passport_image', 'passport_image_url', 'first_name', 'last_name',
+            'id', 'username', 'passport_image', 'passport_image_url', 'first_name', 'last_name',
             'company', 'job_title', 'industry', 'bio', 'interests', 'goals',
             'skills', 'experience_years', 'linkedin', 'website', 'X_account'
         ]
