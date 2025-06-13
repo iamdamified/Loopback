@@ -115,6 +115,7 @@ CORS_ALLOWED_ORIGINS = [
     "https://loopback-f6mg.onrender.com",
     "http://localhost:800",
     "http://159.65.56.250",
+    "https://loop-back-two.vercel.app"
 ]
 
 # Don't do the below in production but for allowing more users for development purposes

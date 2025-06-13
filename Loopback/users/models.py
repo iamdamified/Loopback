@@ -39,7 +39,9 @@ class User(AbstractBaseUser, PermissionsMixin):
     role = models.CharField(max_length=10, choices=ROLE_CHOICES)
     first_name = models.CharField(max_length=30, blank=True)
     last_name = models.CharField(max_length=30, blank=True)
+    username = models.CharField(max_length=255, blank=True, null=True)
     passport_image = models.ImageField(upload_to='passport_images/', blank=True, null=True)
+    passport_image_url = models.URLField(blank=True, null=True)
     company = models.CharField(max_length=255, blank=True, null=True)
     job_title = models.CharField(max_length=255, blank=True, null=True)
     industry = models.CharField(max_length=50, blank=True, null=True)
@@ -47,7 +49,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     interests = models.CharField(max_length=255, blank=True, null=True)
     goals = models.CharField(max_length=255, blank=True, null=True)
     skills = models.CharField(max_length=255, blank=True, null=True)
-    experience = models.IntegerField(default=0, blank=True, null=True)
+    experience_years = models.IntegerField(default=0, blank=True, null=True)
     linkedin = models.URLField(max_length=500, blank=True, null=True)
     website = models.URLField(max_length=500, blank=True, null=True)
     X_account = models.CharField(max_length=100, blank=True, null=True)
@@ -56,6 +58,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     is_staff = models.BooleanField(default=False)
     date_joined = models.DateTimeField(default=timezone.now)
     verified = models.BooleanField(default=False)
+    is_available = models.BooleanField(default=True, help_text="Is the mentor currently available for mentorship?")
 
     objects = UserManager()
 

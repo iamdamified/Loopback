@@ -21,6 +21,7 @@ class MentorProfile(models.Model):
     expertise = models.CharField(max_length=225, blank=True, null=True)
     website = models.URLField(max_length=500, blank=True, null=True)
     X_account = models.CharField(max_length=100, blank=True, null=True)
+    is_available = models.BooleanField(default=True, help_text="Is the mentor currently available for mentorship?")
 
     class Meta:
         verbose_name = "Mentor"
@@ -50,6 +51,7 @@ class MenteeProfile(models.Model):
     expertise = models.CharField(max_length=225, blank=True, null=True)
     website = models.URLField(max_length=500, blank=True, null=True)
     X_account = models.CharField(max_length=100, blank=True, null=True)
+    is_available = models.BooleanField(default=True, help_text="Is the mentee currently available for mentorship?")
 
     class Meta:
         verbose_name = "Mentee"

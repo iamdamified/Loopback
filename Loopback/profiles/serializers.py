@@ -16,7 +16,7 @@ class MentorProfileSerializer(serializers.ModelSerializer):
         fields = [
             'id', 'username', 'passport_image', 'passport_image_url', 'first_name', 'last_name',
             'company', 'job_title', 'industry', 'bio', 'interests', 'goals',
-            'skills', 'experience_years', 'linkedin', 'website', 'X_account'
+            'skills', 'experience_years', 'linkedin', 'website', 'X_account', 'expertise', 'is_available'
         ]
 
     def update(self, instance, validated_data):
@@ -60,7 +60,7 @@ class MenteeProfileSerializer(serializers.ModelSerializer):
         fields = [
             'id', 'username', 'passport_image', 'passport_image_url', 'first_name', 'last_name',
             'company', 'job_title', 'industry', 'bio', 'interests', 'goals',
-            'skills', 'experience_years', 'linkedin', 'website', 'X_account'
+            'skills', 'experience_years', 'linkedin', 'website', 'X_account', 'expertise', 'is_available'
         ]
 
     def update(self, instance, validated_data):

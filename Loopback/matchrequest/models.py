@@ -24,7 +24,7 @@ class MatchRequest(models.Model):
 
 class MeetingSchedule(models.Model):
     match_request = models.ForeignKey(MatchRequest, on_delete=models.CASCADE, related_name='schedules')
-    weekly_goals = models.TextField(blank=True, null=True)
+    purpose = models.TextField(blank=True, null=True)
     scheduled_time = models.DateTimeField()
     meetining_link = models.URLField(max_length=200, blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
