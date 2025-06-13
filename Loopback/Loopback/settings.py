@@ -110,13 +110,15 @@ MIDDLEWARE = [
     'django.middleware.common.CommonMiddleware',
 ]
 
-CORS_ALLOWED_ORIGINS = [
-    "http://localhost:3000",
-    "https://loopback-f6mg.onrender.com",
-    "http://localhost:800",
-    "http://159.65.56.250",
-    "https://loop-back-two.vercel.app"
-]
+# CORS_ALLOWED_ORIGINS = [
+#     "http://localhost:3000",
+#     "https://loopback-f6mg.onrender.com",
+#     "http://localhost:800",
+#     "http://159.65.56.250",
+#     "https://159.65.56.250",
+#     "https://loop-back-two.vercel.app",
+#     "http://loop-back-two.vercel.app"
+# ]
 
 # Don't do the below in production but for allowing more users for development purposes
 CORS_ALLOW_ALL_ORIGINS = True
