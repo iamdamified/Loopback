@@ -24,6 +24,10 @@ class MentorProfile(models.Model):
     website = models.URLField(max_length=500, blank=True, null=True)
     X_account = models.CharField(max_length=100, blank=True, null=True)
     is_available = models.BooleanField(default=True, help_text="Is the mentor currently available for mentorship?")
+    address = models.CharField(max_length=255, blank=True, null=True)
+    phone_number = models.CharField(max_length=20, blank=True, null=True)
+    state = models.CharField(max_length=25, blank=True, null=True)
+    country = models.CharField(max_length=50, blank=True, null=True)
 
     class Meta:
         verbose_name = "Mentor"
@@ -55,6 +59,10 @@ class MenteeProfile(models.Model):
     website = models.URLField(max_length=500, blank=True, null=True)
     X_account = models.CharField(max_length=100, blank=True, null=True)
     is_available = models.BooleanField(default=True, help_text="Is the mentee currently available for mentorship?")
+    address = models.CharField(max_length=255, blank=True, null=True)
+    phone_number = models.CharField(max_length=20, blank=True, null=True)
+    state = models.CharField(max_length=25, blank=True, null=True)
+    country = models.CharField(max_length=50, blank=True, null=True)
 
     class Meta:
         verbose_name = "Mentee"
