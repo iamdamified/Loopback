@@ -10,6 +10,7 @@ from rest_framework_simplejwt.views import TokenRefreshView
 from rest_framework.routers import DefaultRouter
 from dashboard.views import MenteeDashboardView, MentorDashboardView
 from dashboard.progress import ProgressHistoryView
+# from .views import GoogleCalendarSyncView
 
 
 router = DefaultRouter()
@@ -73,6 +74,9 @@ urlpatterns = [
     # Weekly Checkins
     path("weekly-checkin/", WeeklyCheckInListCreateView.as_view(), name="weekly-checkin"),
     path("weekly-checkin/<int:pk>/", WeeklyCheckInUpdateView.as_view(), name="weekly-checkin-update"),
+
+    # Google Calendar Sync
+    # path('sync-google-calendar/', GoogleCalendarSyncView.as_view(), name='sync-google-calendar'),
 
     # Mentorship Feedbacks
     path("mentorship-feedback/", SubmitFeedbackView.as_view(), name="mentorship-feedback"),

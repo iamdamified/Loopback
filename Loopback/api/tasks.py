@@ -127,6 +127,13 @@ Thank you for participating!
         )
 
 
+#Google Calendar
+
+@shared_task
+def sync_all_users_google_calendar():
+    from profiles.models import MenteeProfile, MentorProfile
+    for profile in MentorProfile.objects.exclude(google_credentials__isnull=True):
+        sync_google_calendar_meetings_for_user.delay(profile.user_id)
 
 # Wrapper Tasks
 

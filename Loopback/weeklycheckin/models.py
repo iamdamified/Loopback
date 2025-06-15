@@ -7,6 +7,7 @@ from matchrequest.models import MatchRequest
 # and to be used in the frontend for displaying scheduled meetings and checkins
 class WeeklyCheckInMeetingSchedule(models.Model):
     loop = models.ForeignKey(MentorshipLoop, on_delete=models.CASCADE)
+    google_event_id = models.CharField(max_length=128, blank=True, null=True, unique=True)
     week_number = models.PositiveSmallIntegerField()
     weekly_goals = models.TextField(blank=True, null=True)
     scheduled_date = models.DateField()

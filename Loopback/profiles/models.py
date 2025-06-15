@@ -1,11 +1,13 @@
 from django.db import models
 # from users.models import User
 from django.contrib.auth import get_user_model
+from django.contrib.postgres.fields import JSONField
 
 User = get_user_model()
 # Mentor Model
 class MentorProfile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='mentor_profile')
+    google_credentials = models.JSONField(null=True, blank=True)
     username = models.CharField(max_length=255, blank=True, null=True)
     passport_image = models.ImageField(upload_to='passport_images/', blank=True, null=True)
     passport_image_url = models.URLField(blank=True, null=True)
@@ -36,6 +38,7 @@ class MentorProfile(models.Model):
 # Mentee Model
 class MenteeProfile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='mentee_profile')
+    google_credentials = models.JSONField(null=True, blank=True)
     username = models.CharField(max_length=255, blank=True, null=True)
     passport_image = models.ImageField(upload_to='passport_images/', blank=True, null=True)
     passport_image_url = models.URLField(blank=True, null=True)

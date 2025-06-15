@@ -118,7 +118,7 @@ CORS_ALLOWED_ORIGINS = [
     "https://159.65.56.250",
     "https://loop-back-two.vercel.app",
     "http://loop-back-two.vercel.app",
-    "http://192.168.0.4:3000/",
+    "http://192.168.0.4:3000",
     
 ]
 
