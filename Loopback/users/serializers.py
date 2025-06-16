@@ -45,6 +45,13 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
     website = serializers.URLField(required=False, allow_blank=True)
     X_account = serializers.CharField(required=False, allow_blank=True)
     expertise = serializers.CharField(required=False, allow_blank=True)
+    is_available = serializers.BooleanField(required=False)
+    address = serializers.CharField(required=False, allow_blank=True)
+    phone_number = serializers.CharField(required=False, allow_blank=True)
+    state = serializers.CharField(required=False, allow_blank=True)
+    country = serializers.CharField(required=False, allow_blank=True)
+    google_credentials = serializers.JSONField(required=False, allow_null=True)
+    username = serializers.CharField(required=False, allow_blank=True)
 
     class Meta:
         model = User
@@ -52,7 +59,8 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
             'email', 'password', 'first_name', 'last_name', 'role',
             'passport_image', 'passport_image_url', 'company', 'job_title', 'industry', 'bio',
             'interests', 'goals', 'skills', 'experience_years', 'linkedin',
-            'website', 'X_account', 'expertise'
+            'website', 'X_account', 'expertise', 'is_available', 'address',
+            'phone_number', 'state', 'country', 'google_credentials', 'username'
         ]
 
     def create(self, validated_data):
@@ -82,7 +90,14 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
             'linkedin': validated_data.pop('linkedin', ''),
             'website': validated_data.pop('website', ''),
             'X_account': validated_data.pop('X_account', ''),
-            'expertise': validated_data.pop('expertise', '')
+            'expertise': validated_data.pop('expertise', ''),
+            'is_available': validated_data.pop('is_available', True),
+            'address': validated_data.pop('address', ''),
+            'phone_number': validated_data.pop('phone_number', ''),
+            'state': validated_data.pop('state', ''),
+            'country': validated_data.pop('country', ''),
+            'google_credentials': validated_data.pop('google_credentials', None),
+            'username': validated_data.pop('username', '')
 
         }
 
