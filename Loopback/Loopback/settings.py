@@ -262,6 +262,13 @@ REST_AUTH_REGISTER_SERIALIZERS = {
     'REGISTER_SERIALIZER': 'users.serializers.CustomRegisterSerializer',
 }
 
+
+REST_AUTH_SERIALIZERS = {
+    'SOCIAL_LOGIN_SERIALIZER': 'users.serializers.CustomSocialLoginSerializer',
+}
+
+
+
 from datetime import timedelta
 
 SIMPLE_JWT = {

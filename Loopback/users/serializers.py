@@ -8,6 +8,10 @@ from dj_rest_auth.registration.serializers import RegisterSerializer
 import requests
 from django.core.files.base import ContentFile
 from urllib.parse import urlparse
+from dj_rest_auth.registration.serializers import SocialLoginSerializer
+from allauth.account.utils import user_email
+from allauth.socialaccount.adapter import get_adapter
+from allauth.socialaccount.models import SocialAccount
 
 User = get_user_model()
 
@@ -139,8 +143,26 @@ class CustomRegisterSerializer(RegisterSerializer):
         }
 
 
-# User = get_user_model()
 
+
+class CustomSocialLoginSerializer(SocialLoginSerializer):
+    def validate(self, attrs):
+        attrs = super().validate(attrs)
+
+        email = user_email(attrs['user'])
+
+        try:
+            # Check for existing user with same email
+            existing_user = User.objects.get(email=email)
+
+            # Only override if no social account exists yet for this user
+            if not SocialAccount.objects.filter(user=existing_user, provider='google').exists():
+                attrs['user'] = existing_user
+
+        except User.DoesNotExist:
+            pass
+
+        return attrs
 
 
 # AUTHENTICATION SERIALIZER FOR LOGIN API
