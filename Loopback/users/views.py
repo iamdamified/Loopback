@@ -225,6 +225,9 @@ class CustomTokenView(TokenObtainPairView):
     
 
 # Google login for render
+
+User = get_user_model()
+
 class CustomGoogleLoginView(SocialLoginView):
     adapter_class = GoogleOAuth2Adapter
 
@@ -234,57 +237,30 @@ class CustomGoogleLoginView(SocialLoginView):
             return Response({"error": "Access token is required"}, status=status.HTTP_400_BAD_REQUEST)
 
         try:
-            # Initialize adapter with the request
-            adapter = self.adapter_class(request)
+            # Let the base class handle login using adapter
+            response = super().post(request, *args, **kwargs)
 
-            # Get the provider app (from your settings or DB)
-            app = adapter.get_provider().get_app(request)
+            user = request.user if request.user.is_authenticated else None
 
-            # Parse the token from access_token
-            token = adapter.parse_token({"access_token": access_token})
-            token.app = app
+            if user and user.verified and user.role:
+                return Response({
+                    "detail": "Login successful.",
+                    "user_id": user.id,
+                    "email": user.email
+                }, status=status.HTTP_200_OK)
 
-            # Now complete the login
-            login = adapter.complete_login(request, app, token)
-            login.token = token
-            login.state = SocialLogin.state_from_request(request)
+            elif user and user.verified and not user.role:
+                return HttpResponseRedirect(
+                    f"https://loop-back-two.vercel.app/user-role?user_id={user.id}"
+                )
 
-            # Check if this user already exists
-            google_email = login.account.extra_data.get("email")
-            if not google_email:
-                return Response({"error": "Unable to retrieve email from Google account"}, status=status.HTTP_400_BAD_REQUEST)
-
-            try:
-                existing_user = User.objects.get(email=google_email)
-                login.user = existing_user
-
-                # Log in the user using allauth helper
-                complete_social_login(request, login)
-
-                if existing_user.verified and existing_user.role:
-                    return Response({
-                        "detail": "Login successful.",
-                        "user_id": existing_user.id,
-                        "email": existing_user.email
-                    }, status=status.HTTP_200_OK)
-
-                elif existing_user.verified and not existing_user.role:
-                    return HttpResponseRedirect(
-                        f"https://loop-back-two.vercel.app/user-role?user_id={existing_user.id}"
-                    )
-
-            except User.DoesNotExist:
-                # Let dj-rest-auth handle new user creation
-                pass
-
-            return super().post(request, *args, **kwargs)
+            return response  # Fallback response
 
         except Exception as e:
             return Response({"error": f"Google login failed: {str(e)}"}, status=status.HTTP_400_BAD_REQUEST)
-        
 
 
-        
+
 
 # Password Reset Request View
 class PasswordResetRequestView(APIView):
