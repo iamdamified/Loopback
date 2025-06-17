@@ -20,7 +20,7 @@ class WeeklyCheckInSerializer(serializers.ModelSerializer):
         model = WeeklyCheckIn
         fields = [
             'id', 'loop', 'match', 'google_event_id', 'week_number', 'weekly_goals', 'scheduled_date',
-            'start_time', 'end_time', 'meetining_link', 'created_at', 'updated_at'
+            'start_time', 'end_time', 'meetining_link', 'created_at', 'updated_at', 'status'
         ]
         read_only_fields = ['created_at', 'updated_at']
 
@@ -39,7 +39,7 @@ class WeeklyCheckInFeedbackSerializer(serializers.ModelSerializer):
         model = WeeklyCheckInFeedback
         fields = [
             'id', 'loop', 'week_number', 'mentor_checked_in', 'mentee_checked_in',
-            'progress', 'challenges', 'feedback', 'checkin_date', 'status', 'created_at'
+            'progress', 'challenges', 'feedback', 'checkin_date', 'status', 'created_at',
         ]
         read_only_fields = ['status', 'created_at']
 
