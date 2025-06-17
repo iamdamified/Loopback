@@ -3,7 +3,7 @@ from django.urls import path, include
 from users.views import CustomTokenView, RegisterView, ResendVerificationEmailView, VerifyEmailView, PasswordResetRequestView, PasswordResetConfirmView, CustomGoogleLoginView
 from matchrequest.views import MatchRequestView, MatchResponseView, MentorMatchesRequestsView, MenteeMatchesRequestsView, CreateMeetingScheduleView, MentorMeetingScheduleView, MenteeMeetingScheduleView
 from mentorship.views import CreateMentorshipLoopView, MentorLoopsListView, MenteeLoopsListView
-from weeklycheckin.views import WeeklyCheckInListCreateView, WeeklyCheckInUpdateView
+from weeklycheckin.views import GoogleCalendarCheckInCreateView, WeeklyCheckInFeedback, WeeklyCheckInListCreateView
 from feedback.views import SubmitFeedbackView, UserFeedbackListView, AllFeedbackListView
 from profiles.views import MentorProfileDetailView, MenteeProfileDetailView, AllMentorsListView, SuggestedMentorsListView, AllMenteesListView, MenteeDetailView, MentorDetailView
 from rest_framework_simplejwt.views import TokenRefreshView
@@ -73,9 +73,10 @@ urlpatterns = [
 
     # Weekly Checkins
     path("weekly-checkin/", WeeklyCheckInListCreateView.as_view(), name="weekly-checkin"),
-    path("weekly-checkin/<int:pk>/", WeeklyCheckInUpdateView.as_view(), name="weekly-checkin-update"),
+    path("weekly-checkin-feedback/", WeeklyCheckInFeedback.as_view(), name="weekly-checkin-feedback"),
 
     # Google Calendar Sync
+    path("checkins/schedule/", GoogleCalendarCheckInCreateView.as_view(), name="schedule-checkin"),
     # path('sync-google-calendar/', GoogleCalendarSyncView.as_view(), name='sync-google-calendar'),
 
     # Mentorship Feedbacks

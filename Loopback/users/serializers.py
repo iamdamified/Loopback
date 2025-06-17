@@ -130,17 +130,17 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
 
 
 # GOOGLE OAUTH2 REGISTRATION/LOGIN SERIALIZER
-class CustomRegisterSerializer(RegisterSerializer):
-    username = None  # remove username field
+# class CustomRegisterSerializer(RegisterSerializer):
+#     username = None  # remove username field
 
-    def get_cleaned_data(self):
-        return {
-            'email': self.validated_data.get('email', ''),
-            'password1': self.validated_data.get('password1', ''),
-            'password2': self.validated_data.get('password2', ''),
-            'first_name': self.validated_data.get('first_name', ''),
-            'last_name': self.validated_data.get('last_name', ''),
-        }
+#     def get_cleaned_data(self):
+#         return {
+#             'email': self.validated_data.get('email', ''),
+#             'password1': self.validated_data.get('password1', ''),
+#             'password2': self.validated_data.get('password2', ''),
+#             'first_name': self.validated_data.get('first_name', ''),
+#             'last_name': self.validated_data.get('last_name', ''),
+#         }
 
 
 
