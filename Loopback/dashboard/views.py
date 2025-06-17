@@ -23,7 +23,7 @@ class MenteeDashboardView(APIView):
             return Response({'error': 'No active mentorship loop found.'}, status=404)
 
         mentor = current_loop.mentor
-        last_schedule = MeetingSchedule.objects.filter(match_request__mentee=mentee_profile).order_by('-created_at').first()
+        last_schedule = WeeklyCheckIn.objects.filter(match_request__mentee=mentee_profile).order_by('-created_at').first()
         # To let display only last weekly_goal field
         # last_weekly_goals = (
         #     MeetingSchedule.objects
@@ -33,10 +33,12 @@ class MenteeDashboardView(APIView):
         #     .first()
         # )
         completed_checkins = WeeklyCheckIn.objects.filter(
-            loop=current_loop, mentee_checked_in=True, status=WeeklyCheckIn.STATUS_COMPLETED
+            # loop=current_loop, mentee_checked_in=True, status=WeeklyCheckIn.STATUS_COMPLETED
+            loop=current_loop, status=WeeklyCheckIn.STATUS_COMPLETED
         ).order_by('week_number')
         pending_checkins = WeeklyCheckIn.objects.filter(
-            loop=current_loop, mentee_checked_in=False, status=WeeklyCheckIn.STATUS_PENDING
+            # loop=current_loop, mentee_checked_in=False, status=WeeklyCheckIn.STATUS_PENDING
+            loop=current_loop, status=WeeklyCheckIn.STATUS_PENDING
         ).order_by('week_number')
 
         # Pass objects as instance dict, not .data!
