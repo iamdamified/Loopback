@@ -6,6 +6,13 @@ from matchrequest.models import MatchRequest
 # To be integrated with Google Calendar API for scheduling and reminders
 # and to be used in the frontend for displaying scheduled meetings and checkins
 class WeeklyCheckIn(models.Model):
+    STATUS_PENDING = 'pending'
+    STATUS_COMPLETED = 'completed'
+
+    STATUS_CHOICES = [
+        (STATUS_PENDING, 'Pending'),
+        (STATUS_COMPLETED, 'Completed'),
+    ]
     loop = models.ForeignKey(MentorshipLoop, on_delete=models.CASCADE, blank=True, null=True)
     match = models.ForeignKey(MatchRequest, on_delete=models.CASCADE, related_name='checkins', blank=True, null=True) #handles meeting before loop start
     google_event_id = models.CharField(max_length=128, blank=True, null=True, unique=True)
@@ -17,21 +24,21 @@ class WeeklyCheckIn(models.Model):
     meetining_link = models.URLField(max_length=200, blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
-    # status = models.CharField(max_length=10, choices=STATUS_CHOICES, default=STATUS_PENDING)
+    status = models.CharField(max_length=10, choices=STATUS_CHOICES, default=STATUS_PENDING)
 
-
-    def __str__(self):
-        return f"Meeting for {self.loop} - Week {self.week_number} on {self.scheduled_date.strftime('%Y-%m-%d')} at {self.start_time.strftime('%H:%M')} to {self.end_time.strftime('%H:%M')}"
 
     # def __str__(self):
-    #     return f"Check-in for Week {self.week_number} on {self.scheduled_date.strftime('%Y-%m-%d')}"
+    #     return f"Meeting for {self.loop} - Week {self.week_number} on {self.scheduled_date.strftime('%Y-%m-%d')} at {self.start_time.strftime('%H:%M')} to {self.end_time.strftime('%H:%M')}"
 
-    # def clean(self):
-    #     if not (0 <= self.week_number <= 4):
-    #         raise ValidationError("Week number must be between 0 and 4.")
+    def __str__(self):
+        return f"Check-in for Week {self.week_number} on {self.scheduled_date.strftime('%Y-%m-%d')}at {self.start_time.strftime('%H:%M')} to {self.end_time.strftime('%H:%M')}"
+
+    def clean(self):
+        if not (0 <= self.week_number <= 4):
+            raise ValidationError("Week number must be between 0 and 4.")
         
-    # def save(self, *args, **kwargs):
-    #     super().save(*args, **kwargs)
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
 
 
 
