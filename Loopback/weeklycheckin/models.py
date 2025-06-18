@@ -27,6 +27,7 @@ class WeeklyCheckIn(models.Model):
     status = models.CharField(max_length=10, choices=STATUS_CHOICES, default=STATUS_PENDING)
 
 
+
     # def __str__(self):
     #     return f"Meeting for {self.loop} - Week {self.week_number} on {self.scheduled_date.strftime('%Y-%m-%d')} at {self.start_time.strftime('%H:%M')} to {self.end_time.strftime('%H:%M')}"
 

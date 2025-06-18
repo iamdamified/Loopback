@@ -15,13 +15,11 @@ from .models import WeeklyCheckIn
 from matchrequest.models import MatchRequest
 
 
-
 class GoogleCalendarCheckInCreateView(APIView):
-    permission_classes = [permissions.IsAuthenticated]  # Optional: Restrict to logged-in users
+    permission_classes = [permissions.IsAuthenticated]
 
     def post(self, request, *args, **kwargs):
         data = request.data
-
         # Expected payload example from frontend:
         # {
         #     "loop": 1, will have field  week_number:1 OR  "match": 1, has no week_number
@@ -34,17 +32,35 @@ class GoogleCalendarCheckInCreateView(APIView):
         #     "meetining_link": "https://meet.google.com/xyz-defg"
         # }
 
-        serializer = WeeklyCheckInSerializer(data=data)
-        if serializer.is_valid():
-            if WeeklyCheckIn.objects.filter(google_event_id=data.get("google_event_id")).exists():
-                return Response({"error": "Meeting already exists."}, status=400)
-            serializer.save()
-            return Response({
-                "message": "Check-in meeting successfully scheduled.",
-                "data": serializer.data
-            }, status=status.HTTP_201_CREATED)
+        # Prevent duplicate events
+        if WeeklyCheckIn.objects.filter(google_event_id=data.get("google_event_id")).exists():
+            return Response({"error": "Meeting already exists."}, status=400)
 
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        serializer = WeeklyCheckInSerializer(data=data)
+        if not serializer.is_valid():
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+        loop = data.get("loop")
+        match = data.get("match")
+
+        # Compute the correct week_number if it's tied to a loop
+        if loop:
+            current_week_count = WeeklyCheckIn.objects.filter(loop_id=loop).count()
+            instance = serializer.save(week_number=current_week_count + 1)
+        else:
+            instance = serializer.save()  # match check-ins don’t get week_number
+
+        # Trigger notification logic
+        if instance.status == WeeklyCheckIn.STATUS_COMPLETED:
+            send_checkin_completed_email.delay(instance.id)
+
+            if instance.week_number == 4 and instance.loop:
+                send_loop_completion_email.delay(instance.loop.id)
+
+        return Response({
+            "message": "Check-in meeting successfully scheduled.",
+            "data": WeeklyCheckInSerializer(instance).data
+        }, status=status.HTTP_201_CREATED)
     
 
 # THIS VERSION ENFORCES ALL CONTROL FOR THE CHECKINS CREATION

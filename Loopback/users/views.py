@@ -48,7 +48,8 @@ class RegisterView(APIView):
                 subject="Verify your Email",
                 message=f"Click the link to verify your account: {verify_url}",
                 from_email=settings.DEFAULT_FROM_EMAIL,
-                recipient_list=[user.email]
+                recipient_list=[user.email],
+                fail_silently=False
             )
 
             return Response(
@@ -82,7 +83,8 @@ class ResendVerificationEmailView(APIView):
             subject="Resend: Verify your Email",
             message=f"Click the link to verify your account: {verify_url}",
             from_email=settings.DEFAULT_FROM_EMAIL,
-            recipient_list=[user.email]
+            recipient_list=[user.email],
+            fail_silently=False
         )
 
         return Response({'message': 'Verification email resent!'}, status=status.HTTP_200_OK)
@@ -287,6 +289,7 @@ class PasswordResetRequestView(APIView):
                     message=f'Click here to reset your password: {reset_url}',
                     from_email='adekoyadamilareofficial@gmail.com',  # Must be verified with SendGrid!
                     recipient_list=[email],
+                    fail_silently=False
                 )
             except Exception as e:
                 print (e)

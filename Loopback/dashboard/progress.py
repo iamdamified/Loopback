@@ -1,13 +1,12 @@
 from rest_framework import serializers
 
 class ProgressEventSerializer(serializers.Serializer):
-    type = serializers.CharField()
+    type = serializers.ChoiceField(choices=["meeting", "checkin"])
     date = serializers.DateTimeField()
     week_number = serializers.IntegerField(required=False)
     weekly_goals = serializers.CharField(required=False)
-    progress = serializers.CharField(required=False)
-    challenges = serializers.CharField(required=False)
-    feedback = serializers.CharField(required=False)
+    start_time = serializers.TimeField(required=False)
+    end_time = serializers.TimeField(required=False)
     status = serializers.CharField(required=False)
 
 class ProgressHistorySerializer(serializers.Serializer):
@@ -17,41 +16,49 @@ class ProgressHistorySerializer(serializers.Serializer):
 
 
 
-
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from mentorship.models import MentorshipLoop
-from matchrequest.models import MeetingSchedule
 from weeklycheckin.models import WeeklyCheckIn
+from rest_framework import status
+from django.shortcuts import get_object_or_404
 
 class ProgressHistoryView(APIView):
     def get(self, request, loop_id):
-        # Get loop
-        loop = MentorshipLoop.objects.get(id=loop_id)
-        # Gather meetings
-        meetings = MeetingSchedule.objects.filter(match_request__mentor=loop.mentor, match_request__mentee=loop.mentee)
-        # Gather checkins
-        checkins = WeeklyCheckIn.objects.filter(loop=loop)
-        # Compose timeline
+        loop = get_object_or_404(MentorshipLoop, id=loop_id)
+
+        # Events timeline
         events = []
+
+        # Add meeting events
+        meetings = WeeklyCheckIn.objects.filter(
+            match__mentor=loop.mentor, match__mentee=loop.mentee
+        )
         for m in meetings:
             events.append({
                 "type": "meeting",
-                "date": m.scheduled_time,
+                "date": m.scheduled_date,
+                "start_time": m.start_time,
                 "weekly_goals": m.weekly_goals,
+                "status": m.status,
             })
+
+        # Add check-in events
+        checkins = WeeklyCheckIn.objects.filter(loop=loop)
         for c in checkins:
             events.append({
                 "type": "checkin",
-                "date": c.checkin_date,
+                "date": c.scheduled_date,
                 "week_number": c.week_number,
-                "progress": c.progress,
-                "challenges": c.challenges,
-                "feedback": c.feedback,
+                "start_time": c.start_time,
+                "end_time": c.end_time,
                 "status": c.status,
+                "weekly_goals": c.weekly_goals,
             })
-        # Sort by date
+
+        # Sort chronologically
         events.sort(key=lambda x: x['date'])
+
         data = {
             "loop": {
                 "status": loop.status,
@@ -61,4 +68,6 @@ class ProgressHistoryView(APIView):
             },
             "progress_timeline": events
         }
-        return Response(data)
+
+        serializer = ProgressHistorySerializer(data)
+        return Response(serializer.data, status=status.HTTP_200_OK)

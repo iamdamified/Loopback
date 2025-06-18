@@ -56,7 +56,8 @@ class MatchRequestView(APIView):
                 "Please login to accept or decline."
             ),
             from_email=settings.DEFAULT_FROM_EMAIL,
-            recipient_list=[mentor.user.email]
+            recipient_list=[mentor.user.email],
+            fail_silently=False
         )
 
         return Response({"detail": "Match request sent to mentor."})
@@ -82,7 +83,8 @@ class MatchResponseView(APIView):
                 subject="Mentorship Request Accepted",
                 message=f"{match_request.mentor.user.first_name} {match_request.mentor.user.last_name} has accepted your mentorship request. You will receive further instructions from your mentor soon",
                 from_email=settings.DEFAULT_FROM_EMAIL,
-                recipient_list=[match_request.mentee.user.email]
+                recipient_list=[match_request.mentee.user.email],
+                fail_silently=False
             )
             
         else:
@@ -93,7 +95,8 @@ class MatchResponseView(APIView):
                 subject="Mentorship Request Declined",
                 message=f"Unfortunately, {match_request.mentor.first_name} {match_request.mentor.last_name} has declined your mentorship request.",
                 from_email=settings.DEFAULT_FROM_EMAIL,
-                recipient_list=[match_request.mentee.user.email]
+                recipient_list=[match_request.mentee.user.email],
+                fail_silently=False
             )
 
         return Response({"detail": f"Match request {decision}ed."})
@@ -161,6 +164,7 @@ Please be punctual and reach out if you have any issues.
 """,
                 from_email=settings.DEFAULT_FROM_EMAIL,
                 recipient_list=[mentee_email],
+                fail_silently=False
             )
 
             return Response(MeetingScheduleSerializer(schedule).data, status=status.HTTP_201_CREATED)
