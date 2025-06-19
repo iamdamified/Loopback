@@ -12,6 +12,7 @@ from dj_rest_auth.registration.serializers import SocialLoginSerializer
 from allauth.account.utils import user_email
 from allauth.socialaccount.adapter import get_adapter
 from allauth.socialaccount.models import SocialAccount
+from dj_rest_auth.serializers import LoginSerializer
 
 User = get_user_model()
 
@@ -130,20 +131,36 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
 
 
 # GOOGLE OAUTH2 REGISTRATION/LOGIN SERIALIZER
-# class CustomRegisterSerializer(RegisterSerializer):
-#     username = None  # remove username field
+class CustomRegisterSerializer(RegisterSerializer):
+    username = None  # remove username field
 
-#     def get_cleaned_data(self):
-#         return {
-#             'email': self.validated_data.get('email', ''),
-#             'password1': self.validated_data.get('password1', ''),
-#             'password2': self.validated_data.get('password2', ''),
-#             'first_name': self.validated_data.get('first_name', ''),
-#             'last_name': self.validated_data.get('last_name', ''),
-#         }
+    def get_cleaned_data(self):
+        return {
+            'email': self.validated_data.get('email', ''),
+            'password1': self.validated_data.get('password1', ''),
+            'password2': self.validated_data.get('password2', ''),
+            'first_name': self.validated_data.get('first_name', ''),
+            'last_name': self.validated_data.get('last_name', ''),
+        }
 
 
 
+class CustomLoginSerializer(LoginSerializer):
+    def validate(self, attrs):
+        data = super().validate(attrs)
+
+        user = self.user  # The authenticated user object
+
+        data['user'] = {
+            'id': user.id,
+            'email': user.email,
+            'first_name': user.first_name,
+            'last_name': user.last_name,
+            'role': user.role,
+            'verified': user.verified,
+        }
+
+        return data
 
 class CustomSocialLoginSerializer(SocialLoginSerializer):
     def validate(self, attrs):

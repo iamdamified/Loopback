@@ -114,13 +114,16 @@ MIDDLEWARE = [
 
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000",
+    "https://localhost:3000",
     "https://loopback-f6mg.onrender.com",
+    "http://loopback-f6mg.onrender.com",
     "http://localhost:800",
     "http://159.65.56.250",
     "https://159.65.56.250",
     "https://loop-back-two.vercel.app",
     "http://loop-back-two.vercel.app",
     "http://192.168.0.4:3000",
+    "https://192.168.0.4:3000",
     
 ]
 
@@ -260,9 +263,10 @@ REST_FRAMEWORK = {
 }
 
 
-# REST_AUTH_REGISTER_SERIALIZERS = {
-#     'REGISTER_SERIALIZER': 'users.serializers.CustomRegisterSerializer',
-# }
+REST_AUTH_REGISTER_SERIALIZERS = {
+    'REGISTER_SERIALIZER': 'users.serializers.CustomRegisterSerializer',
+    'LOGIN_SERIALIZER': 'users.serializers.CustomLoginSerializer',
+}
 
 
 REST_AUTH_SERIALIZERS = {
@@ -372,15 +376,15 @@ CELERY_BEAT_SCHEDULE = {
 ### ALL MAY BE REMOVED FOR DIGITAL OCEAN BECAUSE OAUTH@ WORKS WITHOUT THIS 
 # settings for Frontend Redirects
 
-SECURE_SSL_REDIRECT = True
+# SECURE_SSL_REDIRECT = True
 
-SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+# SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
 # Secure cookies (optional)
-SESSION_COOKIE_SECURE = True
-CSRF_COOKIE_SECURE = True
+# SESSION_COOKIE_SECURE = True
+# CSRF_COOKIE_SECURE = True
 
 # HTTP Strict Transport Security(optional)
-SECURE_HSTS_SECONDS = 31536000  # 1 year
-SECURE_HSTS_INCLUDE_SUBDOMAINS = True
-SECURE_HSTS_PRELOAD = True
+# SECURE_HSTS_SECONDS = 31536000  # 1 year
+# SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+# SECURE_HSTS_PRELOAD = True
