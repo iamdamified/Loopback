@@ -1,6 +1,6 @@
 from django.urls import path, include
 # from rest_framework.authtoken.views import obtain_auth_token
-from users.views import CustomTokenView, RegisterView, ResendVerificationEmailView, VerifyEmailView, PasswordResetRequestView, PasswordResetConfirmView, CustomGoogleLoginView
+from users.views import CustomTokenView, RegisterView, ResendVerificationEmailView, VerifyEmailView, PasswordResetRequestView, PasswordResetConfirmView, CustomGoogleLoginView, LogoutView
 from matchrequest.views import MatchRequestView, MatchResponseView, MentorMatchesRequestsView, MenteeMatchesRequestsView, CreateMeetingScheduleView, MentorMeetingScheduleView, MenteeMeetingScheduleView
 from mentorship.views import CreateMentorshipLoopView, MentorLoopsListView, MenteeLoopsListView
 from weeklycheckin.views import GoogleCalendarCheckInCreateView, WeeklyCheckInFeedback, WeeklyCheckInListCreateView
@@ -91,6 +91,9 @@ urlpatterns = [
 
     # PROGRESS HISTORY
     path('progress-history/<int:loop_id>/', ProgressHistoryView.as_view(), name='progress-history'),
+
+    # AUTHENTICATION
+    path('logout/', LogoutView.as_view(), name='logout')
 
 
     # FOR BACKEND
