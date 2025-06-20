@@ -93,7 +93,7 @@ urlpatterns = [
     path('progress-history/<int:loop_id>/', ProgressHistoryView.as_view(), name='progress-history'),
 
     # AUTHENTICATION
-    path('logout/', LogoutView.as_view(), name='logout')
+    path('logout/', LogoutView.as_view(), name='logout'),
 
 
     # FOR BACKEND
