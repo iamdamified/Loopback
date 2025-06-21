@@ -24,6 +24,8 @@ from allauth.socialaccount.providers.google.views import GoogleOAuth2Adapter
 from allauth.socialaccount.helpers import complete_social_login
 from allauth.socialaccount.models import SocialLogin
 from rest_framework import permissions
+from profiles.models import MentorProfile, MenteeProfile
+from rest_framework.permissions import IsAuthenticated
 
 
 # Create your views here.
@@ -204,6 +206,34 @@ class CustomGoogleLoginView(SocialLoginView):
         return response
 
 
+
+class CompleteProfileRoleView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        role = request.data.get("role")
+        user = request.user
+
+        if user.role:
+            return Response({"detail": "Role already assigned."}, status=status.HTTP_400_BAD_REQUEST)
+
+        if role not in ["mentor", "mentee"]:
+            return Response({"error": "Invalid role"}, status=status.HTTP_400_BAD_REQUEST)
+
+        user.role = role
+        user.save()
+
+        if role == "mentor":
+            MentorProfile.objects.get_or_create(user=user)
+        else:
+            MenteeProfile.objects.get_or_create(user=user)
+
+        return Response({
+            "message": f"{role.capitalize()} profile created successfully.",
+            "role": user.role,
+            "user_id": user.id,
+            "email": user.email
+        }, status=status.HTTP_200_OK)
 
 
 

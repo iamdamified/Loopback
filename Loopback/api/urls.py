@@ -1,6 +1,6 @@
 from django.urls import path, include
 # from rest_framework.authtoken.views import obtain_auth_token
-from users.views import CustomTokenView, RegisterView, ResendVerificationEmailView, VerifyEmailView, PasswordResetRequestView, PasswordResetConfirmView, CustomGoogleLoginView, LogoutView
+from users.views import CustomTokenView, RegisterView, ResendVerificationEmailView, VerifyEmailView, PasswordResetRequestView, PasswordResetConfirmView, CustomGoogleLoginView, CompleteProfileRoleView, LogoutView
 from matchrequest.views import MatchRequestView, MatchResponseView, MentorMatchesRequestsView, MenteeMatchesRequestsView, CreateMeetingScheduleView, MentorMeetingScheduleView, MenteeMeetingScheduleView
 from mentorship.views import CreateMentorshipLoopView, MentorLoopsListView, MenteeLoopsListView
 from weeklycheckin.views import GoogleCalendarCheckInCreateView, WeeklyCheckInFeedback, WeeklyCheckInListCreateView
@@ -36,6 +36,8 @@ urlpatterns = [
     path('forgot-password/', PasswordResetRequestView.as_view(), name='forgot-password'),
     path('reset-password-confirm/', PasswordResetConfirmView.as_view(), name='reset-password-confirm'),
     path('auth/google/', CustomGoogleLoginView.as_view(), name='google_login'), # Google register/login
+    path('logout/', LogoutView.as_view(), name='logout'),
+    path('complete-role/', CompleteProfileRoleView.as_view(), name='complete-role'),
 
     
     # User Profile Management and Listing, and Detail Views
@@ -91,9 +93,6 @@ urlpatterns = [
 
     # PROGRESS HISTORY
     path('progress-history/<int:loop_id>/', ProgressHistoryView.as_view(), name='progress-history'),
-
-    # AUTHENTICATION
-    path('logout/', LogoutView.as_view(), name='logout'),
 
 
     # FOR BACKEND
