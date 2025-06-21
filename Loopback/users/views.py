@@ -159,73 +159,64 @@ class CustomTokenView(TokenObtainPairView):
 
 
 # # Google Social Register/login view
-# This view returns google key(200 success) and Preview shows User role page
+# This view returns no google key, just HTML(200 success), redirects automatically and Preview shows User role page
 # class CustomGoogleLoginView(SocialLoginView):
 #     adapter_class = GoogleOAuth2Adapter
 
 #     def post(self, request, *args, **kwargs):
 #         response = super().post(request, *args, **kwargs)
 
-#         # token = response.data.get("access_token")
 #         user = self.request.user
-#         # if user.is_authenticated and not user.role:
+
+#         # If user has no role, redirect to frontend with user ID for role selection
 #         if user.is_authenticated and not getattr(user, 'role', None):
-#             # Redirect to frontend with user ID for role selection
 #             redirect_url = f"https://loop-back-two.vercel.app/user-role?user_id={user.id}"
 #             return HttpResponseRedirect(redirect_url)
 
-#         return response
+#         # Ensure token is returned in response
+#         token = response.data.get("access")
+
+#         return Response({
+#             "key": token,
+#             "user_id": user.id,
+#             "email": user.email,
+#             "first_name": user.first_name,
+#             "last_name": user.last_name,
+#         })
 
 
+# This view returns a key and JSON response with user details but Frontend handles role selections redirect manually through program logic
 class CustomGoogleLoginView(SocialLoginView):
     adapter_class = GoogleOAuth2Adapter
 
-    def post(self, request, *args, **kwargs):
-        response = super().post(request, *args, **kwargs)
+    def get_response(self):
+        user = self.user
+        refresh = RefreshToken.for_user(user)
+        access_token = str(refresh.access_token)
+        refresh_token = str(refresh)
 
-        user = self.request.user
-
-        # If user has no role, redirect
         if user.is_authenticated and not getattr(user, 'role', None):
-            redirect_url = f"https://loop-back-two.vercel.app/user-role?user_id={user.id}"
-            return HttpResponseRedirect(redirect_url)
-
-        # Ensure token is returned in response
-        token = response.data.get("access")
+            return Response({
+                "access": access_token,
+                "refresh": refresh_token,
+                "message": "Role not set. Redirect to role selector.",
+                "redirect_url": f"https://loop-back-two.vercel.app/user-role?user_id={user.id}",
+                "user_id": user.id,
+                "email": user.email,
+                "has_role": False,
+            }, status=status.HTTP_200_OK)
 
         return Response({
-            "key": token,
+            "access": access_token,
+            "refresh": refresh_token,
             "user_id": user.id,
             "email": user.email,
-        })
+            "role": user.role,
+            "first_name": user.first_name,
+            "last_name": user.last_name,
+        }, status=status.HTTP_200_OK)
 
 
-# This view returns no key, but no error(200 success) and Preview shows User role page
-# class CustomGoogleLoginView(SocialLoginView):
-#     adapter_class = GoogleOAuth2Adapter
-
-#     def post(self, request, *args, **kwargs):
-#         response = super().post(request, *args, **kwargs)
-
-#         user = self.request.user
-
-#         # If user is authenticated but has no role, redirect to role selection
-#         if user.is_authenticated and not getattr(user, 'role', None):
-#             redirect_url = f"https://loop-back-two.vercel.app/user-role?user_id={user.id}"
-#             return HttpResponseRedirect(redirect_url)
-
-#         # If login was successful, enrich response with user details
-#         if response.status_code == 200 and user.is_authenticated:
-#             response.data['user'] = {
-#                 'id': user.id,
-#                 'email': user.email,
-#                 'first_name': user.first_name,
-#                 'last_name': user.last_name,
-#                 'role': user.role,
-#                 'verified': user.verified,
-#             }
-
-#         return response
 
 
 

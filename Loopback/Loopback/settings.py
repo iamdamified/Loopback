@@ -268,9 +268,15 @@ REST_AUTH_REGISTER_SERIALIZERS = {
     'LOGIN_SERIALIZER': 'users.serializers.CustomLoginSerializer',
 }
 
+# REST_AUTH_SERIALIZERS = {
+#     'SOCIAL_LOGIN_SERIALIZER': 'dj_rest_auth.registration.serializers.SocialLoginSerializer',
+#     'TOKEN_SERIALIZER': 'dj_rest_auth.serializers.JWTSerializer',
+# }
 
 REST_AUTH_SERIALIZERS = {
     'SOCIAL_LOGIN_SERIALIZER': 'users.serializers.CustomSocialLoginSerializer',
+    'SOCIAL_LOGIN_SERIALIZER': 'dj_rest_auth.registration.serializers.SocialLoginSerializer',
+    'TOKEN_SERIALIZER': 'dj_rest_auth.serializers.JWTSerializer',
 }
 
 
