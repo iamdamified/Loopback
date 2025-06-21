@@ -160,22 +160,44 @@ class CustomTokenView(TokenObtainPairView):
 
 # # Google Social Register/login view
 # This view returns google key(200 success) and Preview shows User role page
+# class CustomGoogleLoginView(SocialLoginView):
+#     adapter_class = GoogleOAuth2Adapter
+
+#     def post(self, request, *args, **kwargs):
+#         response = super().post(request, *args, **kwargs)
+
+#         # token = response.data.get("access_token")
+#         user = self.request.user
+#         # if user.is_authenticated and not user.role:
+#         if user.is_authenticated and not getattr(user, 'role', None):
+#             # Redirect to frontend with user ID for role selection
+#             redirect_url = f"https://loop-back-two.vercel.app/user-role?user_id={user.id}"
+#             return HttpResponseRedirect(redirect_url)
+
+#         return response
+
+
 class CustomGoogleLoginView(SocialLoginView):
     adapter_class = GoogleOAuth2Adapter
 
     def post(self, request, *args, **kwargs):
         response = super().post(request, *args, **kwargs)
 
-        # token = response.data.get("access_token")
         user = self.request.user
-        # if user.is_authenticated and not user.role:
+
+        # If user has no role, redirect
         if user.is_authenticated and not getattr(user, 'role', None):
-            # Redirect to frontend with user ID for role selection
             redirect_url = f"https://loop-back-two.vercel.app/user-role?user_id={user.id}"
             return HttpResponseRedirect(redirect_url)
 
-        return response
+        # Ensure token is returned in response
+        token = response.data.get("access")
 
+        return Response({
+            "key": token,
+            "user_id": user.id,
+            "email": user.email,
+        })
 
 
 # This view returns no key, but no error(200 success) and Preview shows User role page
