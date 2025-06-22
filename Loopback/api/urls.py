@@ -1,6 +1,6 @@
 from django.urls import path, include
 # from rest_framework.authtoken.views import obtain_auth_token
-from users.views import CustomTokenView, RegisterView, ResendVerificationEmailView, VerifyEmailView, PasswordResetRequestView, PasswordResetConfirmView, CustomGoogleLoginView, CompleteProfileRoleView, LogoutView
+from users.views import CustomTokenView, RegisterView, ResendVerificationEmailView, VerifyEmailView, PasswordResetRequestView, PasswordResetConfirmView, CustomGoogleLoginView, CompleteGoogleUserProfileView, LogoutView
 from matchrequest.views import MatchRequestView, MatchResponseView, MentorMatchesRequestsView, MenteeMatchesRequestsView, CreateMeetingScheduleView, MentorMeetingScheduleView, MenteeMeetingScheduleView
 from mentorship.views import CreateMentorshipLoopView, MentorLoopsListView, MenteeLoopsListView
 from weeklycheckin.views import GoogleCalendarCheckInCreateView, WeeklyCheckInFeedback, WeeklyCheckInListCreateView
@@ -35,9 +35,14 @@ urlpatterns = [
     path('token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
     path('forgot-password/', PasswordResetRequestView.as_view(), name='forgot-password'),
     path('reset-password-confirm/', PasswordResetConfirmView.as_view(), name='reset-password-confirm'),
+
+    #google Oauth users
     path('auth/google/', CustomGoogleLoginView.as_view(), name='google_login'), # Google register/login
+    path('auth/google-complete-profile/', CompleteGoogleUserProfileView.as_view(), name='google-complete-profile'),
+
+    #logout
     path('logout/', LogoutView.as_view(), name='logout'),
-    path('complete-role/', CompleteProfileRoleView.as_view(), name='complete-role'),
+    
 
     
     # User Profile Management and Listing, and Detail Views

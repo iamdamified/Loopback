@@ -174,7 +174,7 @@ class CustomTokenView(TokenObtainPairView):
 #             return HttpResponseRedirect(redirect_url)
 
 #         # Ensure token is returned in response
-#         token = response.data.get("access")
+#         token = response.data.get("key") or response.data.get("access")
 
 #         return Response({
 #             "key": token,
@@ -186,19 +186,51 @@ class CustomTokenView(TokenObtainPairView):
 
 
 # This view returns a key and JSON response with user details but Frontend handles role selections redirect manually through program logic
+# class CustomGoogleLoginView(SocialLoginView):
+#     adapter_class = GoogleOAuth2Adapter
+
+#     def get_response(self):
+#         user = self.user
+#         refresh = RefreshToken.for_user(user)
+#         access_token = str(refresh.access_token)
+#         refresh_token = str(refresh)
+
+#         if user.is_authenticated and not getattr(user, 'role', None):
+        #     return Response({
+        #         "access": access_token,
+        #         "refresh": refresh_token,
+        #         "message": "Role not set. Redirect to role selector.",
+        #         "redirect_url": f"https://loop-back-two.vercel.app/user-role?user_id={user.id}",
+        #         "user_id": user.id,
+        #         "email": user.email,
+        #         "has_role": False,
+        #     }, status=status.HTTP_200_OK)
+
+        # return Response({
+        #     "access": access_token,
+        #     "refresh": refresh_token,
+        #     "user_id": user.id,
+        #     "email": user.email,
+        #     "role": user.role,
+        #     "first_name": user.first_name,
+        #     "last_name": user.last_name,
+        # }, status=status.HTTP_200_OK)
+
+
 class CustomGoogleLoginView(SocialLoginView):
     adapter_class = GoogleOAuth2Adapter
 
     def get_response(self):
+        # Override to use JWT instead of `key`
         user = self.user
         refresh = RefreshToken.for_user(user)
         access_token = str(refresh.access_token)
-        refresh_token = str(refresh)
 
-        if user.is_authenticated and not getattr(user, 'role', None):
+        # Check role
+        if not getattr(user, 'role', None):
             return Response({
                 "access": access_token,
-                "refresh": refresh_token,
+                "refresh": str(refresh),
                 "message": "Role not set. Redirect to role selector.",
                 "redirect_url": f"https://loop-back-two.vercel.app/user-role?user_id={user.id}",
                 "user_id": user.id,
@@ -206,9 +238,10 @@ class CustomGoogleLoginView(SocialLoginView):
                 "has_role": False,
             }, status=status.HTTP_200_OK)
 
+        # Return full info if role exists
         return Response({
             "access": access_token,
-            "refresh": refresh_token,
+            "refresh": str(refresh),
             "user_id": user.id,
             "email": user.email,
             "role": user.role,
@@ -218,37 +251,36 @@ class CustomGoogleLoginView(SocialLoginView):
 
 
 
-
-
-class CompleteProfileRoleView(APIView):
+class CompleteGoogleUserProfileView(APIView):
     permission_classes = [IsAuthenticated]
 
     def post(self, request):
-        role = request.data.get("role")
         user = request.user
-
         if user.role:
             return Response({"detail": "Role already assigned."}, status=status.HTTP_400_BAD_REQUEST)
 
-        if role not in ["mentor", "mentee"]:
-            return Response({"error": "Invalid role"}, status=status.HTTP_400_BAD_REQUEST)
+        serializer = UserRegistrationSerializer(instance=user, data=request.data, partial=True)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
 
-        user.role = role
-        user.save()
-
-        if role == "mentor":
-            MentorProfile.objects.get_or_create(user=user)
+        # Create profile
+        if user.role == 'mentor':
+            profile, _ = MentorProfile.objects.get_or_create(user=user)
         else:
-            MenteeProfile.objects.get_or_create(user=user)
+            profile, _ = MenteeProfile.objects.get_or_create(user=user)
+
+        # Update profile fields
+        profile_fields = serializer.validated_data
+        for field in profile_fields:
+            if hasattr(profile, field):
+                setattr(profile, field, profile_fields[field])
+        profile.save()
 
         return Response({
-            "message": f"{role.capitalize()} profile created successfully.",
+            "message": f"{user.role.capitalize()} profile completed successfully.",
             "role": user.role,
             "user_id": user.id,
             "email": user.email,
-            "first_name": user.first_name,
-            "last_name": user.last_name,
-            
         }, status=status.HTTP_200_OK)
 
 
