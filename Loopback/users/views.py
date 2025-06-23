@@ -66,6 +66,7 @@ class RegisterView(APIView):
 
 
 
+
 # RESEND VERIFICATION EMAIL
 
 class ResendVerificationEmailView(APIView):
@@ -185,36 +186,6 @@ class CustomTokenView(TokenObtainPairView):
 #         })
 
 
-# This view returns a key and JSON response with user details but Frontend handles role selections redirect manually through program logic
-# class CustomGoogleLoginView(SocialLoginView):
-#     adapter_class = GoogleOAuth2Adapter
-
-#     def get_response(self):
-#         user = self.user
-#         refresh = RefreshToken.for_user(user)
-#         access_token = str(refresh.access_token)
-#         refresh_token = str(refresh)
-
-#         if user.is_authenticated and not getattr(user, 'role', None):
-        #     return Response({
-        #         "access": access_token,
-        #         "refresh": refresh_token,
-        #         "message": "Role not set. Redirect to role selector.",
-        #         "redirect_url": f"https://loop-back-two.vercel.app/user-role?user_id={user.id}",
-        #         "user_id": user.id,
-        #         "email": user.email,
-        #         "has_role": False,
-        #     }, status=status.HTTP_200_OK)
-
-        # return Response({
-        #     "access": access_token,
-        #     "refresh": refresh_token,
-        #     "user_id": user.id,
-        #     "email": user.email,
-        #     "role": user.role,
-        #     "first_name": user.first_name,
-        #     "last_name": user.last_name,
-        # }, status=status.HTTP_200_OK)
 
 
 class CustomGoogleLoginView(SocialLoginView):
@@ -262,6 +233,10 @@ class CompleteGoogleUserProfileView(APIView):
         serializer = UserRegistrationSerializer(instance=user, data=request.data, partial=True)
         serializer.is_valid(raise_exception=True)
         serializer.save()
+
+        # Mark user as verified/active
+        user.is_active = True
+        user.save()
 
         # Create profile
         if user.role == 'mentor':

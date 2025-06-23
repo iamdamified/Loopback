@@ -308,6 +308,8 @@ SOCIALACCOUNT_PROVIDERS = {
 }
 
 
+SOCIALACCOUNT_ADAPTER = 'Loopback.adapters.CustomSocialAccountAdapter'
+
 ACCOUNT_ADAPTER = 'users.adapters.NoRedirectAccountAdapter'
 
 

@@ -4,6 +4,10 @@ from .models import SupportTicket
 from .serializers import SupportTicketSerializer, AdminResponseSerializer
 from rest_framework.permissions import IsAdminUser, IsAuthenticated
 from django.utils import timezone
+from django.conf import settings
+from django.core.mail import send_mail
+from rest_framework.response import Response
+from rest_framework import status
 
 class CreateSupportTicketView(generics.CreateAPIView):
     serializer_class = SupportTicketSerializer
@@ -27,11 +31,20 @@ class AdminSupportTicketListView(generics.ListAPIView):
     permission_classes = [IsAdminUser]
 
 
+
 class AdminRespondToTicketView(generics.UpdateAPIView):
     queryset = SupportTicket.objects.all()
     serializer_class = AdminResponseSerializer
     permission_classes = [IsAdminUser]
 
     def perform_update(self, serializer):
-        serializer.save(responded_at=timezone.now())
+        ticket = serializer.save(responded_at=timezone.now())
 
+        # Send email notification to user
+        send_mail(
+            subject=f"Response to Your Support Ticket: {ticket.subject}",
+            message=f"Hello {ticket.user.first_name},\n\nYour support ticket has been updated:\n\n{ticket.admin_response}",
+            from_email=settings.DEFAULT_FROM_EMAIL,
+            recipient_list=[ticket.user.email],
+            fail_silently=False,
+        )
