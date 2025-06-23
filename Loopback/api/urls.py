@@ -10,6 +10,8 @@ from rest_framework_simplejwt.views import TokenRefreshView
 from rest_framework.routers import DefaultRouter
 from dashboard.views import MenteeDashboardView, MentorDashboardView
 from dashboard.progress import ProgressHistoryView
+from support.views import CreateSupportTicketView, ListUserSupportTicketsView, AdminSupportTicketListView, AdminRespondToTicketView
+
 # from .views import GoogleCalendarSyncView
 
 
@@ -65,7 +67,7 @@ urlpatterns = [
     path('meeting-schedule/<int:match_request_id>/', CreateMeetingScheduleView.as_view(), name='create-meeting'),
 
 
-    #Introductory Meeting Schedule
+    #Introductory Meeting Schedule  (currently not used)
     path('meeting/mentor/', MentorMeetingScheduleView.as_view(), name='mentor-meetings'),
     path('meeting/mentee/', MenteeMeetingScheduleView.as_view(), name='mentee-meetings'),
 
@@ -78,11 +80,11 @@ urlpatterns = [
     # /?status=pending
     
 
-    # Weekly Checkins
+    # Weekly Checkins (currently not used)
     path("weekly-checkin/", WeeklyCheckInListCreateView.as_view(), name="weekly-checkin"),
     path("weekly-checkin-feedback/", WeeklyCheckInFeedback.as_view(), name="weekly-checkin-feedback"),
 
-    # Google Calendar Sync
+    # Google Calendar Weekly_Checkin and Meeting_before_Loop Creation
     path("checkins/schedule/", GoogleCalendarCheckInCreateView.as_view(), name="schedule-checkin"),
     # path('sync-google-calendar/', GoogleCalendarSyncView.as_view(), name='sync-google-calendar'),
 
@@ -90,6 +92,12 @@ urlpatterns = [
     path("mentorship-feedback/", SubmitFeedbackView.as_view(), name="mentorship-feedback"),
     path('user-feedback/', UserFeedbackListView.as_view(), name='user-feedback-list'),
     path('all-feedback/', AllFeedbackListView.as_view(), name='all-feedback-list'),
+
+    # SUPPORT TICKETS
+    path('create-support/', CreateSupportTicketView.as_view(), name='create-support'),
+    path('user-tickets/', ListUserSupportTicketsView.as_view(), name='user-tickets'),
+    path('all-support/', AdminSupportTicketListView.as_view(), name='support-all'),
+    path('support-response/<int:pk>/', AdminRespondToTicketView.as_view(), name='support-respond'),
 
 
     # DASHBOARD

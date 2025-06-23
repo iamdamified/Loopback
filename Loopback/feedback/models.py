@@ -9,10 +9,16 @@ User = get_user_model()
 class MentorshipFeedback(models.Model):
     loop = models.ForeignKey(MentorshipLoop, on_delete=models.CASCADE, related_name='feedbacks')
     user = models.ForeignKey(User, on_delete=models.CASCADE)
-    comments = models.TextField()
+    review = models.TextField()
     submitted_at = models.DateTimeField(auto_now_add=True)
-    rate = models.IntegerField(choices=[(i, str(i)) for i in range(1, 6)])  # 1–5 stars
-    successful = models.BooleanField()
+    rate = models.CharField(max_length=10, choices=[
+        ('excellent', 'Excellent'),
+        ('very good', 'Very good'),
+        ('good', 'Good'),
+        ('fair', 'Fair')
+    ], default='good')
+    # rate = models.IntegerField(choices=[(i, str(i)) for i in range(1, 6)])  # 1–5 stars
+    # successful = models.BooleanField()
 
     class Meta:
         unique_together = ('loop', 'user')  # Prevent multiple submissions

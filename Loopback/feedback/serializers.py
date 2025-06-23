@@ -6,7 +6,7 @@ from django.utils import timezone
 class MentorshipFeedbackSerializer(serializers.ModelSerializer):
     class Meta:
         model = MentorshipFeedback
-        fields = ['id', 'loop', 'user', 'comments', 'submitted_at', 'rate', 'successful']
+        fields = ['id', 'loop', 'user', 'review', 'submitted_at', 'rate']
         read_only_fields = ['id', 'submitted_at', 'user']
 
     def validate(self, data):
