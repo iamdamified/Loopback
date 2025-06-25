@@ -1,5 +1,3 @@
-# Create your views here.
-from rest_framework import serializers
 from rest_framework.response import Response
 from rest_framework.pagination import PageNumberPagination
 from .matching import get_suggested_mentors_for_mentee
