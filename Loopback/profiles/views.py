@@ -31,7 +31,7 @@ class MenteeProfileDetailView(generics.RetrieveUpdateAPIView):
 
 class AllMenteesListView(generics.ListAPIView):
     # queryset = MenteeProfile.objects.filter(user__verified=True)
-    queryset = MentorProfile.objects.all()
+    queryset = MenteeProfile.objects.all()
     serializer_class = MenteeSummarySerializer
     # permission_classes = [permissions.IsAuthenticated]
     filter_backends = [filters.SearchFilter, filters.OrderingFilter]

@@ -96,10 +96,11 @@ class MenteeProfileSerializer(serializers.ModelSerializer):
 
 class MenteeSummarySerializer(serializers.ModelSerializer):
     full_name = serializers.SerializerMethodField()
+    email = serializers.EmailField(source='user.email')
 
     class Meta:
         model = MenteeProfile
-        fields = ['id', 'passport_image', 'full_name', 'interests', 'goals']
+        fields = ['id', 'passport_image', 'full_name', 'bio', 'email']
 
     def get_full_name(self, obj):
         return f"{obj.user.first_name} {obj.user.last_name}"
@@ -107,10 +108,11 @@ class MenteeSummarySerializer(serializers.ModelSerializer):
 
 class MentorSummarySerializer(serializers.ModelSerializer):
     full_name = serializers.SerializerMethodField()
+    email = serializers.EmailField(source='user.email')
 
     class Meta:
         model = MentorProfile
-        fields = ['id', 'passport_image', 'full_name', 'interests', 'goals']
+        fields = ['id', 'passport_image', 'full_name', 'bio', 'email']
 
     def get_full_name(self, obj):
         return f"{obj.user.first_name} {obj.user.last_name}"
