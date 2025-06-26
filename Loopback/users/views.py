@@ -18,11 +18,8 @@ from django.contrib.auth.hashers import make_password
 from allauth.socialaccount.providers.google.views import GoogleOAuth2Adapter
 from dj_rest_auth.registration.views import SocialLoginView
 from django.http import HttpResponseRedirect
-import requests
 from django.http import HttpResponseRedirect
 from allauth.socialaccount.providers.google.views import GoogleOAuth2Adapter
-from allauth.socialaccount.helpers import complete_social_login
-from allauth.socialaccount.models import SocialLogin
 from rest_framework import permissions
 from profiles.models import MentorProfile, MenteeProfile
 from rest_framework.permissions import IsAuthenticated

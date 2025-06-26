@@ -5,6 +5,7 @@ from django.contrib.postgres.fields import JSONField
 
 User = get_user_model()
 # Mentor Model
+
 class MentorProfile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='mentor_profile')
     google_credentials = models.JSONField(null=True, blank=True)

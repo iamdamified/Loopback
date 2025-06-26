@@ -30,7 +30,7 @@ class MenteeProfileDetailView(generics.RetrieveUpdateAPIView):
 class AllMenteesListView(generics.ListAPIView):
     # queryset = MenteeProfile.objects.filter(user__verified=True)
     queryset = MenteeProfile.objects.all()
-    serializer_class = MenteeSummarySerializer
+    serializer_class =  MenteeSummarySerializer #MenteeProfileSerializer #MenteeSummarySerializer
     # permission_classes = [permissions.IsAuthenticated]
     filter_backends = [filters.SearchFilter, filters.OrderingFilter]
     search_fields = ['user__first_name', 'user__last_name', 'user__email', 'bio', 'interests', 'skills', 'industry', 'job_title']
@@ -39,7 +39,8 @@ class AllMenteesListView(generics.ListAPIView):
 
 
 class MenteeDetailView(generics.RetrieveAPIView):
-    queryset = MenteeProfile.objects.filter(user__verified=True)
+    # queryset = MenteeProfile.objects.filter(user__verified=True) # We will use this again after dealing with ensuring all Oauth users are verified 
+    queryset = MenteeProfile.objects.all()
     serializer_class = MenteeProfileSerializer
     lookup_field = 'id'
 
@@ -90,7 +91,8 @@ class SuggestedMentorsListView(generics.ListAPIView):
 
 
 class MentorDetailView(generics.RetrieveAPIView):
-    queryset = MentorProfile.objects.filter(user__verified=True)
+    # queryset = MentorProfile.objects.filter(user__verified=True)
+    queryset = MentorProfile.objects.all()
     serializer_class = MentorProfileSerializer
     lookup_field = 'id'
 

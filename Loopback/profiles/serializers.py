@@ -10,11 +10,12 @@ User = get_user_model()
 class MentorProfileSerializer(serializers.ModelSerializer):
     first_name = serializers.CharField(source='user.first_name', required=False)
     last_name = serializers.CharField(source='user.last_name', required=False)
+    user_id = serializers.ReadOnlyField(source='user.id')  # This adds the user ID
 
     class Meta:
         model = MentorProfile
         fields = [
-            'id', 'username', 'passport_image', 'passport_image_url', 'first_name', 'last_name',
+            'id', 'user_id', 'username', 'passport_image', 'passport_image_url', 'first_name', 'last_name',
             'company', 'job_title', 'industry', 'bio', 'interests', 'goals',
             'skills', 'experience_years', 'linkedin', 'website', 'X_account', 'expertise', 'is_available',
             'address', 'phone_number', 'state', 'country', 'google_credentials'
@@ -51,15 +52,17 @@ class MentorProfileSerializer(serializers.ModelSerializer):
 
 
 
+
 # Mentee Profile Serializer
 class MenteeProfileSerializer(serializers.ModelSerializer):
     first_name = serializers.CharField(source='user.first_name', required=False)
     last_name = serializers.CharField(source='user.last_name', required=False)
+    user_id = serializers.ReadOnlyField(source='user.id')  # This adds the user ID
 
     class Meta:
         model = MenteeProfile
         fields = [
-            'id', 'username', 'passport_image', 'passport_image_url', 'first_name', 'last_name',
+            'id', 'user_id', 'username', 'passport_image', 'passport_image_url', 'first_name', 'last_name',
             'company', 'job_title', 'industry', 'bio', 'interests', 'goals',
             'skills', 'experience_years', 'linkedin', 'website', 'X_account', 'expertise', 'is_available',
             'address', 'phone_number', 'state', 'country', 'google_credentials'
