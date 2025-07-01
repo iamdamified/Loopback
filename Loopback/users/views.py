@@ -363,7 +363,7 @@ class CompleteGoogleUserProfileView(APIView):
 #                 send_mail(
 #                     subject='Password Reset on Loopback',
 #                     message=f'Click here to reset your password: {reset_url}',
-#                     from_email='adekoyadamilareofficial@gmail.com',  # Must be verified with SendGrid!
+#                     from_email='Loopback <adekoyadamilareofficial@gmail.com>',
 #                     recipient_list=[email],
 #                     fail_silently=False
 #                 )

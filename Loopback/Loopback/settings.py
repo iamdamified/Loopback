@@ -313,16 +313,16 @@ SOCIALACCOUNT_ADAPTER = 'Loopback.adapters.CustomSocialAccountAdapter'
 ACCOUNT_ADAPTER = 'users.adapters.NoRedirectAccountAdapter'
 
 
+# GOOGLE EMAIL SENDING
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
 
-# EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-# EMAIL_HOST = 'smtp.gmail.com'
-# EMAIL_PORT = 587
-# EMAIL_USE_TLS = True
+EMAIL_HOST_USER = config("EMAIL_HOST_USER")  # your Gmail address
+EMAIL_HOST_PASSWORD = config("EMAIL_HOST_PASSWORD")  # 16-digit app password from Google
 
-# EMAIL_HOST_USER = config("EMAIL_HOST_USER")  # your Gmail address
-# EMAIL_HOST_PASSWORD = config("EMAIL_HOST_PASSWORD")  # 16-digit app password from Google
-
-# DEFAULT_FROM_EMAIL = 'Loopback <adekoyadamilareofficial@gmail.com>'
+DEFAULT_FROM_EMAIL = 'Loopback <adekoyadamilareofficial@gmail.com>'
 
 
 
@@ -335,11 +335,11 @@ ACCOUNT_ADAPTER = 'users.adapters.NoRedirectAccountAdapter'
 # DEFAULT_FROM_EMAIL = config("DEFAULT_FROM_EMAIL")
 
 
-#FOR SENDING VERIFICATION AND OTHER EMAILS
-DEFAULT_FROM_EMAIL = config("DEFAULT_FROM_EMAIL")
-EMAIL_BACKEND = "sendgrid_backend.SendgridBackend"
-SENDGRID_SANDBOX_MODE_IN_DEBUG = False
-SENDGRID_API_KEY = config("SENDGRID_API_KEY")
+#FOR SENDING VERIFICATION AND OTHER EMAILS(MAIN SENDGRID)
+# DEFAULT_FROM_EMAIL = config("DEFAULT_FROM_EMAIL")
+# EMAIL_BACKEND = "sendgrid_backend.SendgridBackend"
+# SENDGRID_SANDBOX_MODE_IN_DEBUG = False
+# SENDGRID_API_KEY = config("SENDGRID_API_KEY")
 
 
 # FOR GOOGLE LOGIN

@@ -30,5 +30,10 @@ celery -A loopback beat --loglevel=info
 
 
 
+or
+redis-server
+celery -A loopback worker --loglevel=info
+celery -A loopback beat --scheduler django --loglevel=info
+
 Zander of very academy tutorial run instruction:
 celery -A loopback worker -l info --pool=solo
