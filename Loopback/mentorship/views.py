@@ -52,8 +52,8 @@ class CreateMentorshipLoopView(APIView):
         if not match_request:
             return Response({"detail": "You must have a completed match request with this mentee."}, status=400)
 
-        # Check if meeting has been scheduled
-        # if not match_request.instance.exists():
+        # Check if meeting has been scheduled: schedule, match, or instance
+        # if not match_request.match.exists():
         #     return Response({"detail": "You must have scheduled a meeting with this mentee before creating a loop."}, status=400)
 
         # Prevent duplicate loop
@@ -72,29 +72,36 @@ class CreateMentorshipLoopView(APIView):
         )
 
         # Send Email Notification to Mentee about the new loop created
-        send_mail(
-            subject='🎉 Your Mentorship Loop Has Been Created!',
-            message=f"""
-        Hi {mentee.user.first_name},
+        try:
 
-        A new mentorship loop has been initiated by your mentor {mentor.user.first_name} {mentor.user.last_name}.
+            send_mail(
+                subject='🎉 Your Mentorship Loop Has Been Created!',
+                message=f"""
+            Hi {mentee.user.first_name},
 
-        📝 Purpose: {purpose or 'No purpose provided'}
-        📅 Start Date: {start_date}
-        📅 End Date: {end_date}
+            A new mentorship loop has been initiated by your mentor {mentor.user.first_name} {mentor.user.last_name}.
 
-        Please be prepared and make the most of your upcoming sessions!
+            📝 Purpose: {purpose or 'No purpose provided'}
+            📅 Start Date: {start_date}
+            📅 End Date: {end_date}
 
-        Best,
-        The Mentorship Team
-        """.strip(),
-            from_email=settings.DEFAULT_FROM_EMAIL,
-            recipient_list=[mentee.user.email],
-            fail_silently=False  
-        )
+            Please be prepared and make the most of your upcoming sessions!
 
-        serializer = MentorshipLoopSerializer(mentorship_loop)
-        return Response(serializer.data, status=201)
+            Best,
+            The Mentorship Team
+            """.strip(),
+                from_email=settings.DEFAULT_FROM_EMAIL,
+                recipient_list=[mentee.user.email],
+                fail_silently=False  
+            )
+
+            serializer = MentorshipLoopSerializer(mentorship_loop)
+            return Response(serializer.data, status=201)
+        
+        except Exception as e:
+            # Log the failure and return the link in the response
+            print(f"🎉 Your Mentorship Loop Has Been Created!, but we failed to send mentee an email: {e}")
+            return Response({"message": "🎉 Your Mentorship Loop Has Been Created!, but failed to send mentee an email."}, status=201)
 
 
 
