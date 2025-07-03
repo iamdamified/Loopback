@@ -25,3 +25,4 @@ class MentorshipLoop(models.Model):
 
     def __str__(self):
         return f"Loop: {self.mentee.user.first_name} & {self.mentor.user.first_name} [{self.status}]"
+    

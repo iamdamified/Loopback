@@ -10,6 +10,7 @@ from .models import MentorshipLoop
 from .serializers import MentorshipLoopSerializer
 from profiles.models import MentorProfile, MenteeProfile
 from matchrequest.models import MatchRequest
+from weeklycheckin.models import WeeklyCheckIn
 
 class CreateMentorshipLoopView(APIView):
     permission_classes = [IsAuthenticated]
@@ -47,13 +48,13 @@ class CreateMentorshipLoopView(APIView):
             return Response({"detail": "You already have 5 active mentorship loops."}, status=400)
 
         # Check for completed match request
-        match_request = MatchRequest.objects.filter(mentor=mentor, mentee=mentee, status='completed').first()
+        match_request = MatchRequest.objects.filter(mentor=mentor, mentee=mentee, status='accepted').first()
         if not match_request:
             return Response({"detail": "You must have a completed match request with this mentee."}, status=400)
 
         # Check if meeting has been scheduled
-        if not match_request.schedules.exists():
-            return Response({"detail": "You must have scheduled a meeting with this mentee before creating a loop."}, status=400)
+        # if not match_request.instance.exists():
+        #     return Response({"detail": "You must have scheduled a meeting with this mentee before creating a loop."}, status=400)
 
         # Prevent duplicate loop
         if MentorshipLoop.objects.filter(mentor=mentor, mentee=mentee, is_active=True).exists():
