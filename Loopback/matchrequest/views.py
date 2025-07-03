@@ -49,20 +49,36 @@ class MatchRequestView(APIView):
             return Response({"detail": "Match request already exists."}, status=400)
 
         # Send email to mentor
-        send_mail(
-            subject="New Mentorship Match Request",
-            message=(
-                f"{mentee.user.first_name} {mentee.user.last_name} has requested to start a mentorship loop with you on LoopBack. "
-                "Please login to accept or decline."
-            ),
-            from_email=settings.DEFAULT_FROM_EMAIL,
-            recipient_list=[mentor.user.email],
-            fail_silently=False
-        )
+        # send_mail(
+        #     subject="New Mentorship Match Request",
+        #     message=(
+        #         f"{mentee.user.first_name} {mentee.user.last_name} has requested to start a mentorship loop with you on LoopBack. "
+        #         "Please login to accept or decline."
+        #     ),
+        #     from_email=settings.DEFAULT_FROM_EMAIL,
+        #     recipient_list=[mentor.user.email],
+        #     fail_silently=False
+        # )
 
-        return Response({"detail": "Match request sent to mentor."})
+        # return Response({"detail": "Match request sent to mentor."})
     
 
+        try:
+            send_mail(
+                subject="New Mentorship Match Request",
+                message=(
+                    f"{mentee.user.first_name} {mentee.user.last_name} has requested to start a mentorship loop with you on LoopBack. "
+                    "Please login to accept or decline."
+                ),
+                from_email=settings.DEFAULT_FROM_EMAIL,
+                recipient_list=[mentor.user.email],
+                fail_silently=False
+            )
+            return Response({"detail": "Match request sent to mentor."},status=status.HTTP_201_CREATED)
+        except Exception as e:
+            # Log the failure and return the link in the response
+            print(f"Failed to send mentor an email: {e}")
+            return Response({"message": "Request successful, but failed to send mentor an email."}, status=status.HTTP_201_CREATED)
 
 
 class MatchResponseView(APIView):
@@ -79,27 +95,53 @@ class MatchResponseView(APIView):
             match_request.status = "accepted"
             match_request.save()
 
-            send_mail(
-                subject="Mentorship Request Accepted",
-                message=f"{match_request.mentor.user.first_name} {match_request.mentor.user.last_name} has accepted your mentorship request. You will receive further instructions from your mentor soon",
-                from_email=settings.DEFAULT_FROM_EMAIL,
-                recipient_list=[match_request.mentee.user.email],
-                fail_silently=False
-            )
+            # send_mail(
+            #     subject="Mentorship Request Accepted",
+            #     message=f"{match_request.mentor.user.first_name} {match_request.mentor.user.last_name} has accepted your mentorship request. You will receive further instructions from your mentor soon",
+            #     from_email=settings.DEFAULT_FROM_EMAIL,
+            #     recipient_list=[match_request.mentee.user.email],
+            #     fail_silently=False
+            # )
             
+            try:
+                send_mail(
+                    subject="Mentorship Request Accepted",
+                    message=f"{match_request.mentor.user.first_name} {match_request.mentor.user.last_name} has accepted your mentorship request. You will receive further instructions from your mentor soon",
+                    from_email=settings.DEFAULT_FROM_EMAIL,
+                    recipient_list=[match_request.mentee.user.email],
+                    fail_silently=False
+                )
+                return Response({"detail": "Match request has been accepted, and email sent to mentee"},status=status.HTTP_201_CREATED)
+            except Exception as e:
+                # Log the failure and return the link in the response
+                print(f"Failed to send mentor an email: {e}")
+                return Response({"message": "Match response successful, but failed to send mentee an email."}, status=status.HTTP_201_CREATED)
         else:
             match_request.status = "declined"
             match_request.save()
 
-            send_mail(
-                subject="Mentorship Request Declined",
-                message=f"Unfortunately, {match_request.mentor.first_name} {match_request.mentor.last_name} has declined your mentorship request.",
-                from_email=settings.DEFAULT_FROM_EMAIL,
-                recipient_list=[match_request.mentee.user.email],
-                fail_silently=False
-            )
+            # send_mail(
+            #     subject="Mentorship Request Declined",
+            #     message=f"Unfortunately, {match_request.mentor.first_name} {match_request.mentor.last_name} has declined your mentorship request.",
+            #     from_email=settings.DEFAULT_FROM_EMAIL,
+            #     recipient_list=[match_request.mentee.user.email],
+            #     fail_silently=False
+            # )
+            try:
+                send_mail(
+                    subject="Mentorship Request Declined",
+                    message=f"Unfortunately, {match_request.mentor.first_name} {match_request.mentor.last_name} has declined your mentorship request.",
+                    from_email=settings.DEFAULT_FROM_EMAIL,
+                    recipient_list=[match_request.mentee.user.email],
+                    fail_silently=False
+                )
+                return Response({"detail": "Match request has been declined, and email sent to mentee"},status=status.HTTP_201_CREATED)
+            except Exception as e:
+                # Log the failure and return the link in the response
+                print(f"You have successfully declined request, but we failed to send mentee an email: {e}")
+                return Response({"message": "Match response successful, but failed to send mentee an email."}, status=status.HTTP_201_CREATED)
 
-        return Response({"detail": f"Match request {decision}ed."})
+        # return Response({"detail": f"Match request {decision}ed."})
 
 
 class MentorMatchesRequestsView(APIView):
