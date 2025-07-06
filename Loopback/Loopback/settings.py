@@ -355,6 +355,7 @@ LOGOUT_REDIRECT_URL = ''
 # FOR CELERY
 
 CELERY_BROKER_URL = 'redis://localhost:6379/0'
+# CELERY_BROKER_URL = config("CELERY_BROKER_URL")
 CELERY_ACCEPT_CONTENT = ['json']
 CELERY_TASK_SERIALIZER = 'json'
 
@@ -362,7 +363,9 @@ CELERY_TASK_SERIALIZER = 'json'
 INSTALLED_APPS += ['django_celery_beat']
 
 
+
 # TASKS SCHEDULE
+# CELERY_BEAT_SCHEDULER = 'django_celery_beat.schedulers.DatabaseScheduler'
 
 from celery.schedules import crontab
 
@@ -374,6 +377,10 @@ CELERY_BEAT_SCHEDULE = {
     'send_loop_completion_reminders_daily': {
         'task': 'api.tasks.send_all_loop_completion_emails',
         'schedule': crontab(hour=9, minute=0),  # Every day at 9:00 AM
+    },
+    'update_loop_statuses_daily': {
+        'task': 'api.tasks.update_all_loop_statuses',
+        'schedule': crontab(hour=0, minute=0),  # Every day at midnight
     },
 }
 

@@ -2,7 +2,7 @@ from django.urls import path, include
 # from rest_framework.authtoken.views import obtain_auth_token
 from users.views import CustomTokenView, RegisterView, ResendVerificationEmailView, VerifyEmailView, PasswordResetRequestView, PasswordResetConfirmView, CustomGoogleLoginView, CompleteGoogleUserProfileView, LogoutView
 from matchrequest.views import MatchRequestView, MatchResponseView, MentorMatchesRequestsView, MenteeMatchesRequestsView, CreateMeetingScheduleView, MentorMeetingScheduleView, MenteeMeetingScheduleView
-from mentorship.views import CreateMentorshipLoopView, MentorLoopsListView, MenteeLoopsListView
+from mentorship.views import CreateMentorshipLoopView, UpdateMentorshipLoopView, RefreshLoopStatusView, MentorLoopsListView, MenteeLoopsListView
 from weeklycheckin.views import GoogleCalendarCheckInCreateView, WeeklyCheckInFeedback, WeeklyCheckInListCreateView
 from feedback.views import SubmitFeedbackView, UserFeedbackListView, AllFeedbackListView
 from profiles.views import MentorProfileDetailView, MenteeProfileDetailView, AllMentorsListView, SuggestedMentorsListView, AllMenteesListView, MenteeDetailView, MentorDetailView
@@ -73,6 +73,8 @@ urlpatterns = [
 
     # MENTORSHIP
     path('loops/create/', CreateMentorshipLoopView.as_view(), name='create_mentorship_loop'),
+    path('loop-update/<int:loop_id>/', UpdateMentorshipLoopView.as_view(), name='update-mentorship-loop'),
+    path('loop/status-refresh/<int:loop_id>/', RefreshLoopStatusView.as_view(), name='refresh-loop-status'),
     path('loops/mentor/', MentorLoopsListView.as_view(), name='mentor-loops'),
     path('loops/mentee/', MenteeLoopsListView.as_view(), name='mentee-loops'),
     # /?status=ongoing

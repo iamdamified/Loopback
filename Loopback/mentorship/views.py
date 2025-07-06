@@ -105,6 +105,64 @@ class CreateMentorshipLoopView(APIView):
 
 
 
+class UpdateMentorshipLoopView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def put(self, request, loop_id):
+        loop = get_object_or_404(MentorshipLoop, id=loop_id, mentor__user=request.user)
+
+        purpose = request.data.get("purpose")
+        start_date_str = request.data.get("start_date")
+        end_date_str = request.data.get("end_date")
+        is_active = request.data.get("is_active")
+
+        # Validate and update purpose
+        if purpose is not None:
+            loop.purpose = purpose
+
+        # Validate and update start_date
+        if start_date_str:
+            try:
+                start_date = timezone.datetime.strptime(start_date_str, "%Y-%m-%d").date()
+                loop.start_date = start_date
+            except ValueError:
+                return Response({"detail": "Invalid start_date format. Use YYYY-MM-DD."}, status=400)
+
+        # Validate and update end_date
+        if end_date_str:
+            try:
+                end_date = timezone.datetime.strptime(end_date_str, "%Y-%m-%d").date()
+                loop.end_date = end_date
+            except ValueError:
+                return Response({"detail": "Invalid end_date format. Use YYYY-MM-DD."}, status=400)
+
+        # Validate and update is_active
+        if is_active is not None:
+            loop.is_active = bool(is_active)
+
+        # Save and trigger status auto-update
+        loop.save()
+
+        serializer = MentorshipLoopSerializer(loop)
+        return Response(serializer.data, status=200)
+    
+
+
+class RefreshLoopStatusView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request, loop_id):
+        try:
+            loop = MentorshipLoop.objects.get(id=loop_id)
+        except MentorshipLoop.DoesNotExist:
+            return Response({"error": "Loop not found."}, status=404)
+
+        loop.save()  # Triggers status update
+        return Response({"status": loop.status})
+    
+
+
+
 class MentorLoopsListView(APIView):
     permission_classes = [IsAuthenticated]
 
@@ -134,6 +192,12 @@ class MenteeLoopsListView(APIView):
 
         serializer = MentorshipLoopSerializer(loops, many=True)
         return Response(serializer.data, status=200)
+    
+
+
+    
+
+
 
 # MENTORSHIP USERS FRONTEND DASHBOARD VIEWS (I WILL CREATE A SEPARATE APP FOR THIS AFTER MOVING FILES)
 

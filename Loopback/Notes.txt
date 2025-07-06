@@ -37,3 +37,13 @@ celery -A loopback beat --scheduler django --loglevel=info
 
 Zander of very academy tutorial run instruction:
 celery -A loopback worker -l info --pool=solo
+
+
+# FOR A DEPLOYMENT READY CELERY_BEAT_REDIS TASK AUTOMATTION: (Dockefile and docker-compose.yml) use in bash cli-
+docker-compose up --build   or docker build -t my-django-app . #not likely
+docker-compose up
+
+Option 2
+
+docker-compose build
+docker-compose up

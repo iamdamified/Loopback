@@ -23,6 +23,21 @@ class MentorshipLoop(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
+    def save(self, *args, **kwargs):
+        today = timezone.now().date()
+
+        if self.start_date and self.end_date:
+            if today < self.start_date:
+                self.status = 'pending'
+            elif self.start_date <= today <= self.end_date:
+                self.status = 'ongoing'
+            elif today > self.end_date:
+                self.status = 'completed'
+        else:
+            self.status = 'pending'  # Fallback if dates are missing
+
+        super().save(*args, **kwargs)
+
     def __str__(self):
         return f"Loop: {self.mentee.user.first_name} & {self.mentor.user.first_name} [{self.status}]"
     

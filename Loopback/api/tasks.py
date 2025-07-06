@@ -155,4 +155,23 @@ def send_all_loop_completion_emails():
         send_loop_completion_email.delay(loop.id)
 
 
+@shared_task
+def update_all_loop_statuses():
+    today = timezone.now().date()
+    loops = MentorshipLoop.objects.all()
 
+    for loop in loops:
+        previous_status = loop.status
+
+        if loop.start_date and loop.end_date:
+            if today < loop.start_date:
+                loop.status = 'pending'
+            elif loop.start_date <= today <= loop.end_date:
+                loop.status = 'ongoing'
+            elif today > loop.end_date:
+                loop.status = 'completed'
+        else:
+            loop.status = 'pending'
+
+        if loop.status != previous_status:
+            loop.save()
