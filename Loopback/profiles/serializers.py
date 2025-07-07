@@ -117,7 +117,7 @@ class MentorSummarySerializer(serializers.ModelSerializer):
 
     class Meta:
         model = MentorProfile
-        fields = ['id', 'passport_image', 'full_name', 'bio', 'email']
+        fields = ['id', 'passport_image', 'full_name', 'bio', 'email', 'interests', 'goals', 'skills', 'expertise', 'industry']
 
     def get_full_name(self, obj):
         return f"{obj.user.first_name} {obj.user.last_name}"
