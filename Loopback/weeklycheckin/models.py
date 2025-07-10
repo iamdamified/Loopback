@@ -31,6 +31,10 @@ class WeeklyCheckIn(models.Model):
     checkin_created = models.BooleanField(default=False)
 
     @property
+    def is_checkin_created(self):
+        return self.google_event_id is not None and self.scheduled_date is not None
+
+    @property
     def is_completed(self):
         """
         Dynamically determines if the check-in has passed its scheduled end time.
