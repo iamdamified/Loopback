@@ -87,8 +87,8 @@ urlpatterns = [
     path("weekly-checkin-feedback/", WeeklyCheckInFeedback.as_view(), name="weekly-checkin-feedback"),
 
     # Google Calendar Weekly_Checkin and Meeting_before_Loop Creation
-    path("checkins/schedule/", GoogleCalendarCheckInCreateView.as_view(), name="schedule-checkin"),
-    # path('sync-google-calendar/', GoogleCalendarSyncView.as_view(), name='sync-google-calendar'),
+    path("checkins/schedule/", GoogleCalendarCheckInCreateView.as_view(), name="schedule-checkin"),#Frontend
+    # path('sync-google-calendar/', GoogleCalendarSyncView.as_view(), name='sync-google-calendar'),#BAckend
 
     # Mentorship Feedbacks
     path("mentorship-feedback/", SubmitFeedbackView.as_view(), name="mentorship-feedback"),

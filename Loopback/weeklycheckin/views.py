@@ -50,6 +50,8 @@ class GoogleCalendarCheckInCreateView(APIView):
         else:
             instance = serializer.save()  # match check-ins don’t get week_number
 
+        instance = serializer.save(checkin_created=True)
+
         # Trigger notification logic
         if instance.status == WeeklyCheckIn.STATUS_COMPLETED:
             send_checkin_completed_email.delay(instance.id)

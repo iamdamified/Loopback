@@ -2,6 +2,9 @@ from django.db import models
 from django.core.exceptions import ValidationError
 from mentorship.models import MentorshipLoop
 from matchrequest.models import MatchRequest
+from django.utils import timezone
+import datetime
+
 
 # To be integrated with Google Calendar API for scheduling and reminders
 # and to be used in the frontend for displaying scheduled meetings and checkins
@@ -25,6 +28,20 @@ class WeeklyCheckIn(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     status = models.CharField(max_length=10, choices=STATUS_CHOICES, default=STATUS_PENDING)
+    checkin_created = models.BooleanField(default=False)
+
+    @property
+    def is_completed(self):
+        """
+        Dynamically determines if the check-in has passed its scheduled end time.
+        Does NOT change the database.
+        """
+        if self.scheduled_date and self.end_time:
+            end_datetime = datetime.datetime.combine(self.scheduled_date, self.end_time)
+            if timezone.is_naive(end_datetime):
+                end_datetime = timezone.make_aware(end_datetime)
+            return timezone.now() > end_datetime
+        return False
 
 
 
@@ -32,8 +49,12 @@ class WeeklyCheckIn(models.Model):
     #     return f"Meeting for {self.loop} - Week {self.week_number} on {self.scheduled_date.strftime('%Y-%m-%d')} at {self.start_time.strftime('%H:%M')} to {self.end_time.strftime('%H:%M')}"
 
     def __str__(self):
-        return f"Check-in for Week {self.week_number} on {self.scheduled_date.strftime('%Y-%m-%d')}at {self.start_time.strftime('%H:%M')} to {self.end_time.strftime('%H:%M')}"
-
+        date_str = self.scheduled_date.strftime('%Y-%m-%d') if self.scheduled_date else "No date"
+        start_str = self.start_time.strftime('%H:%M') if self.start_time else "No start"
+        end_str = self.end_time.strftime('%H:%M') if self.end_time else "No end"
+        week_str = f"Week {self.week_number}" if self.week_number is not None else "No week"
+        return f"Check-in for {week_str} on {date_str} at {start_str} to {end_str}"
+    
     def clean(self):
         if not (0 <= self.week_number <= 4):
             raise ValidationError("Week number must be between 0 and 4.")

@@ -10,6 +10,7 @@ from django.conf import settings
 from .serializers import MatchRequestSerializer, MeetingScheduleSerializer
 from rest_framework import generics
 from rest_framework import status
+from weeklycheckin.models import WeeklyCheckIn
 
 
 
@@ -144,6 +145,20 @@ class MatchResponseView(APIView):
         # return Response({"detail": f"Match request {decision}ed."})
 
 
+# class MentorMatchesRequestsView(APIView):
+#     permission_classes = [IsAuthenticated]
+
+#     def get(self, request):
+#         try:
+#             mentor_profile = MentorProfile.objects.get(user=request.user)
+#         except MentorProfile.DoesNotExist:
+#             return Response({"detail": "Mentor profile not found."}, status=404)
+
+#         match_requests = MatchRequest.objects.filter(mentor=mentor_profile)
+#         serializer = MatchRequestSerializer(match_requests, many=True)
+#         return Response(serializer.data)
+
+
 class MentorMatchesRequestsView(APIView):
     permission_classes = [IsAuthenticated]
 
@@ -154,8 +169,24 @@ class MentorMatchesRequestsView(APIView):
             return Response({"detail": "Mentor profile not found."}, status=404)
 
         match_requests = MatchRequest.objects.filter(mentor=mentor_profile)
-        serializer = MatchRequestSerializer(match_requests, many=True)
-        return Response(serializer.data)
+
+        response_data = []
+
+        for match in match_requests:
+            # Get the latest (or first) check-in for this match, if any
+            checkin = WeeklyCheckIn.objects.filter(match=match).order_by('-created_at').first()
+
+            response_data.append({
+                "match_id": match.id,
+                "mentee_id": match.mentee.id,
+                "mentee_name": f"{match.mentee.user.first_name} {match.mentee.user.last_name}".strip(),
+                "match_status": match.status,
+                "checkin_created": checkin.checkin_created if checkin else False,
+                "checkin_status": checkin.status if checkin else None,
+                "checkin_is_completed": checkin.is_completed if checkin else None,
+            })
+
+        return Response(response_data)
 
 
 class MenteeMatchesRequestsView(APIView):

@@ -5,6 +5,7 @@ from matchrequest.models import MatchRequest
 
 
 class WeeklyCheckInSerializer(serializers.ModelSerializer):
+    is_completed = serializers.ReadOnlyField()
     loop = serializers.PrimaryKeyRelatedField(
         queryset=MentorshipLoop.objects.all(),
         required=False,
@@ -20,9 +21,9 @@ class WeeklyCheckInSerializer(serializers.ModelSerializer):
         model = WeeklyCheckIn
         fields = [
             'id', 'loop', 'match', 'google_event_id', 'week_number', 'weekly_goals', 'scheduled_date',
-            'start_time', 'end_time', 'meetining_link', 'created_at', 'updated_at', 'status'
+            'start_time', 'end_time', 'meetining_link', 'created_at', 'updated_at', 'status', 'checkin_created'
         ]
-        read_only_fields = ['created_at', 'updated_at']
+        read_only_fields = ['created_at', 'updated_at', 'status', 'checkin_created', 'is_completed']
 
     def validate(self, data):
         if not data.get('loop') and not data.get('match'):
