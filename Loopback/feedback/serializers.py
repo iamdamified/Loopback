@@ -13,8 +13,8 @@ class MentorshipFeedbackSerializer(serializers.ModelSerializer):
         user = self.context['request'].user
         loop = data['loop']
 
-        if loop.is_active or loop.end_date > timezone.now().date():
-            raise serializers.ValidationError("Feedback can only be submitted after the loop ends.")
+        # if loop.is_active or loop.end_date > timezone.now().date():
+        #     raise serializers.ValidationError("Feedback can only be submitted after the loop ends.")
 
         if MentorshipFeedback.objects.filter(loop=loop, user=user).exists():
             raise serializers.ValidationError("You have already submitted feedback for this loop.")
