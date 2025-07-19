@@ -35,6 +35,7 @@ urlpatterns = [
     path('verify-email/<uidb64>/<token>/', VerifyEmailView.as_view(), name='verify-email'),
     path('login/', CustomTokenView.as_view(), name='token_obtain_login'),
     path('token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
+    # path('api/token/refresh/', CustomTokenRefreshView.as_view(), name='token_refresh'),
     path('forgot-password/', PasswordResetRequestView.as_view(), name='forgot-password'),
     path('reset-password-confirm/', PasswordResetConfirmView.as_view(), name='reset-password-confirm'),
 

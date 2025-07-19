@@ -13,6 +13,9 @@ from allauth.account.utils import user_email
 from allauth.socialaccount.adapter import get_adapter
 from allauth.socialaccount.models import SocialAccount
 from dj_rest_auth.serializers import LoginSerializer
+from rest_framework_simplejwt.views import TokenRefreshView
+from rest_framework_simplejwt.serializers import TokenRefreshSerializer
+
 
 User = get_user_model()
 
@@ -191,3 +194,12 @@ class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
         data['user_id'] = self.user.id
         data['role'] = self.user.role
         return data
+
+
+# class CustomTokenRefreshSerializer(TokenRefreshSerializer):
+#     def validate(self, attrs):
+#         data = super().validate(attrs)
+#         # Here, only access is returned by default. Do not include refresh again.
+#         return {
+#             'access': data['access'],
+#         }

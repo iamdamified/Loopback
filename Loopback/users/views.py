@@ -239,6 +239,9 @@ class CustomTokenView(TokenObtainPairView):
 
 
 
+# class CustomTokenRefreshView(TokenRefreshView):
+#     serializer_class = CustomTokenRefreshSerializer
+
 # # Google Social Register/login view
 # This view returns no google key, just HTML(200 success), redirects automatically and Preview shows User role page
 # class CustomGoogleLoginView(SocialLoginView):
