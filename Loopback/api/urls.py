@@ -3,7 +3,7 @@ from django.urls import path, include
 from users.views import CustomTokenView, RegisterView, ResendVerificationEmailView, VerifyEmailView, PasswordResetRequestView, PasswordResetConfirmView, CustomGoogleLoginView, CompleteGoogleUserProfileView, LogoutView
 from matchrequest.views import MatchRequestView, MatchResponseView, MentorMatchesRequestsView, MenteeMatchesRequestsView, CreateMeetingScheduleView, MentorMeetingScheduleView, MenteeMeetingScheduleView
 from mentorship.views import CreateMentorshipLoopView, UpdateMentorshipLoopView, RefreshLoopStatusView, MentorLoopsListView, MenteeLoopsListView
-from weeklycheckin.views import GoogleCalendarCheckInCreateView, WeeklyCheckInFeedback, WeeklyCheckInListCreateView
+from weeklycheckin.views import GoogleCalendarCheckInCreateView, UserCheckInMeetingsView, WeeklyCheckInFeedback, WeeklyCheckInListCreateView
 from feedback.views import SubmitFeedbackView, UserFeedbackListView, AllFeedbackListView
 from profiles.views import MentorProfileDetailView, MenteeProfileDetailView, AllMentorsListView, SuggestedMentorsListView, AllMenteesListView, MenteeDetailView, MentorDetailView
 from rest_framework_simplejwt.views import TokenRefreshView
@@ -89,6 +89,8 @@ urlpatterns = [
 
     # Google Calendar Weekly_Checkin and Meeting_before_Loop Creation
     path("checkins/schedule/", GoogleCalendarCheckInCreateView.as_view(), name="schedule-checkin"),#Frontend
+    path('user/meetings/', UserCheckInMeetingsView.as_view(), name='user-checkin-meetings'),
+    # To filter and view a specific user's meeting, you can use : GET /api/meetings/?google_event_id=abc123
     # path('sync-google-calendar/', GoogleCalendarSyncView.as_view(), name='sync-google-calendar'),#BAckend
 
     # Mentorship Feedbacks

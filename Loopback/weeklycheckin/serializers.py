@@ -21,7 +21,7 @@ class WeeklyCheckInSerializer(serializers.ModelSerializer):
         model = WeeklyCheckIn
         fields = [
             'id', 'loop', 'match', 'google_event_id', 'week_number', 'weekly_goals', 'scheduled_date',
-            'start_time', 'end_time', 'meetining_link', 'created_at', 'updated_at', 'status', 'checkin_created'
+            'start_time', 'end_time', 'meetining_link', 'created_at', 'updated_at', 'status', 'checkin_created', 'is_completed'
         ]
         read_only_fields = ['created_at', 'updated_at', 'status', 'checkin_created', 'is_completed']
 

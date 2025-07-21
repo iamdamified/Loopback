@@ -13,6 +13,7 @@ from rest_framework import status, permissions
 from .serializers import WeeklyCheckInSerializer
 from .models import WeeklyCheckIn
 from matchrequest.models import MatchRequest
+from django.db.models import Q
 
 
 class GoogleCalendarCheckInCreateView(APIView):
@@ -64,6 +65,68 @@ class GoogleCalendarCheckInCreateView(APIView):
             "data": WeeklyCheckInSerializer(instance).data
         }, status=status.HTTP_201_CREATED)
     
+
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from rest_framework import permissions, status
+from django.db.models import Q
+from django.core.exceptions import ObjectDoesNotExist
+
+from .models import WeeklyCheckIn
+from .serializers import WeeklyCheckInSerializer
+
+
+class UserCheckInMeetingsView(APIView):
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get(self, request, *args, **kwargs):
+        user = request.user
+        event_id = request.query_params.get("google_event_id", None)
+
+        # Safely access the mentor and mentee profiles using correct related_name
+        try:
+            mentor_profile = user.mentor_profile
+        except ObjectDoesNotExist:
+            mentor_profile = None
+
+        try:
+            mentee_profile = user.mentee_profile
+        except ObjectDoesNotExist:
+            mentee_profile = None
+
+        # Ensure the user is either a mentor or mentee
+        if not mentor_profile and not mentee_profile:
+            return Response(
+                {"error": "User is neither a mentor nor a mentee."},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        # Build filtering conditions
+        loop_conditions = Q()
+        match_conditions = Q()
+
+        if mentor_profile:
+            loop_conditions |= Q(loop__mentor=mentor_profile)
+            match_conditions |= Q(match__mentor=mentor_profile)
+
+        if mentee_profile:
+            loop_conditions |= Q(loop__mentee=mentee_profile)
+            match_conditions |= Q(match__mentee=mentee_profile)
+
+        # Query matching check-ins
+        loop_checkins = WeeklyCheckIn.objects.filter(loop_conditions)
+        match_checkins = WeeklyCheckIn.objects.filter(match_conditions)
+        all_checkins = (loop_checkins | match_checkins).distinct()
+
+        # Optional filtering by Google event ID
+        if event_id:
+            all_checkins = all_checkins.filter(google_event_id=event_id)
+
+        # Serialize and return
+        serializer = WeeklyCheckInSerializer(all_checkins, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+
 
 # THIS VERSION ENFORCES ALL CONTROL FOR THE CHECKINS CREATION
 
