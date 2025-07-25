@@ -3,7 +3,7 @@ from django.urls import path, include
 from users.views import CustomTokenView, RegisterView, ResendVerificationEmailView, VerifyEmailView, PasswordResetRequestView, PasswordResetConfirmView, CustomGoogleLoginView, CompleteGoogleUserProfileView, LogoutView
 from matchrequest.views import MatchRequestView, MatchResponseView, MentorMatchesRequestsView, MenteeMatchesRequestsView
 from mentorship.views import CreateMentorshipLoopView, UpdateMentorshipLoopView, RefreshLoopStatusView, MentorLoopsListView, MenteeLoopsListView
-from weeklycheckin.views import GoogleCalendarCheckInCreateView, UserCheckInMeetingsView
+from weeklycheckin.views import GoogleCalendarCheckInCreateView, UserCheckInMeetingsView, WeeklyCheckInListCreateView
 from feedback.views import SubmitFeedbackView, UserFeedbackListView, AllFeedbackListView
 from profiles.views import MentorProfileDetailView, MenteeProfileDetailView, AllMentorsListView, SuggestedMentorsListView, AllMenteesListView, MenteeDetailView, MentorDetailView
 from rest_framework_simplejwt.views import TokenRefreshView
@@ -84,7 +84,7 @@ urlpatterns = [
     
 
     # Weekly Checkins (currently not used)
-    # path("weekly-checkin/", WeeklyCheckInListCreateView.as_view(), name="weekly-checkin"),
+    path("weekly-checkin/", WeeklyCheckInListCreateView.as_view(), name="weekly-checkin"),
     # path("weekly-checkin-feedback/", WeeklyCheckInFeedback.as_view(), name="weekly-checkin-feedback"),
 
     # Google Calendar Weekly_Checkin and Meeting_before_Loop Creation
