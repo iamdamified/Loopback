@@ -3,17 +3,14 @@ from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from django.shortcuts import get_object_or_404
 from profiles.models import MenteeProfile, MentorProfile
-from .models import MatchRequest, MeetingSchedule
+from .models import MatchRequest
 from django.core.mail import send_mail
 from django.contrib.auth import get_user_model
 from django.conf import settings
-from .serializers import MatchRequestSerializer, MeetingScheduleSerializer
+from .serializers import MatchRequestSerializer
 from rest_framework import generics
 from rest_framework import status
 from weeklycheckin.models import WeeklyCheckIn
-
-
-
 
 User = get_user_model()
 
@@ -205,61 +202,61 @@ class MenteeMatchesRequestsView(APIView):
 
 
 
-class CreateMeetingScheduleView(APIView):
-    permission_classes = [IsAuthenticated]
+# class CreateMeetingScheduleView(APIView):
+#     permission_classes = [IsAuthenticated]
 
-    def post(self, request, match_request_id):
-        match_request = get_object_or_404(MatchRequest, id=match_request_id, mentor__user=request.user)
+#     def post(self, request, match_request_id):
+#         match_request = get_object_or_404(MatchRequest, id=match_request_id, mentor__user=request.user)
 
-        # Restriction to only allow meeting if match was accepted
-        if match_request.status != "accepted":
-            return Response(
-                {"detail": "Meetings can only be scheduled for accepted match requests."},
-                status=status.HTTP_400_BAD_REQUEST,
-            )
+#         # Restriction to only allow meeting if match was accepted
+#         if match_request.status != "accepted":
+#             return Response(
+#                 {"detail": "Meetings can only be scheduled for accepted match requests."},
+#                 status=status.HTTP_400_BAD_REQUEST,
+#             )
 
-        serializer = MeetingScheduleSerializer(data=request.data)
-        if serializer.is_valid():
-            schedule = serializer.save(match_request=match_request)
+#         serializer = MeetingScheduleSerializer(data=request.data)
+#         if serializer.is_valid():
+#             schedule = serializer.save(match_request=match_request)
 
-            # Send email to mentee
-            mentee_email = match_request.mentee.user.email
-            send_mail(
-                subject="A Mentorship Introductory Meeting Scheduled",
-                message=f"""
-A meeting has been scheduled with your mentor.
+#             # Send email to mentee
+#             mentee_email = match_request.mentee.user.email
+#             send_mail(
+#                 subject="A Mentorship Introductory Meeting Scheduled",
+#                 message=f"""
+# A meeting has been scheduled with your mentor.
 
-📅 Time: {schedule.scheduled_time}
-🔗 Link: {schedule.meetining_link or 'Not provided'}
-📝 Comment: {schedule.comment or 'No additional comments'}
+# 📅 Time: {schedule.scheduled_time}
+# 🔗 Link: {schedule.meetining_link or 'Not provided'}
+# 📝 Comment: {schedule.comment or 'No additional comments'}
 
-Please be punctual and reach out if you have any issues.
-""",
-                from_email=settings.DEFAULT_FROM_EMAIL,
-                recipient_list=[mentee_email],
-                fail_silently=False
-            )
+# Please be punctual and reach out if you have any issues.
+# """,
+#                 from_email=settings.DEFAULT_FROM_EMAIL,
+#                 recipient_list=[mentee_email],
+#                 fail_silently=False
+#             )
 
-            return Response(MeetingScheduleSerializer(schedule).data, status=status.HTTP_201_CREATED)
+#             return Response(MeetingScheduleSerializer(schedule).data, status=status.HTTP_201_CREATED)
 
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-
+#         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-class MentorMeetingScheduleView(generics.ListAPIView):
-    permission_classes = [IsAuthenticated]
-    serializer_class = MeetingScheduleSerializer
-
-    def get_queryset(self):
-        return MeetingSchedule.objects.filter(match_request__mentor__user=self.request.user)
 
 
-class MenteeMeetingScheduleView(generics.ListAPIView):
-    permission_classes = [IsAuthenticated]
-    serializer_class = MeetingScheduleSerializer
+# class MentorMeetingScheduleView(generics.ListAPIView):
+#     permission_classes = [IsAuthenticated]
+#     serializer_class = MeetingScheduleSerializer
 
-    def get_queryset(self):
-        return MeetingSchedule.objects.filter(match_request__mentee__user=self.request.user)
+#     def get_queryset(self):
+#         return MeetingSchedule.objects.filter(match_request__mentor__user=self.request.user)
+
+
+# class MenteeMeetingScheduleView(generics.ListAPIView):
+#     permission_classes = [IsAuthenticated]
+#     serializer_class = MeetingScheduleSerializer
+
+#     def get_queryset(self):
+#         return MeetingSchedule.objects.filter(match_request__mentee__user=self.request.user)
 
 

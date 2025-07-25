@@ -22,13 +22,13 @@ class MatchRequest(models.Model):
         return f"{self.mentee.user.first_name} → {self.mentor.user.first_name} [{self.status}]"
 
 
-class MeetingSchedule(models.Model):
-    match_request = models.ForeignKey(MatchRequest, on_delete=models.CASCADE, related_name='schedules')
-    purpose = models.TextField(blank=True, null=True)
-    scheduled_time = models.DateTimeField()
-    meetining_link = models.URLField(max_length=200, blank=True, null=True)
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
+# class MeetingSchedule(models.Model):
+#     match_request = models.ForeignKey(MatchRequest, on_delete=models.CASCADE, related_name='schedules')
+#     purpose = models.TextField(blank=True, null=True)
+#     scheduled_time = models.DateTimeField()
+#     meetining_link = models.URLField(max_length=200, blank=True, null=True)
+#     created_at = models.DateTimeField(auto_now_add=True)
+#     updated_at = models.DateTimeField(auto_now=True)
 
-    def __str__(self):
-        return f"Meeting for {self.match_request} at {self.scheduled_time.strftime('%Y-%m-%d %H:%M')}"
+#     def __str__(self):
+#         return f"Meeting for {self.match_request} at {self.scheduled_time.strftime('%Y-%m-%d %H:%M')}"

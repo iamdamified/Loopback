@@ -72,41 +72,41 @@ class WeeklyCheckIn(models.Model):
 # In case we do not need to create separate feedback for Weekly Check-ins, we can takeout STATUS
 # and add it to the WeeklyCheckinMeetingSchedule model above for progress tracking, then delete this model.
 # in this case, loop field must be optional, ensure not to add unique_together, and adjust clean to 0 to 4 to make space for 0week(first meeting schedule)
-class WeeklyCheckInFeedback(models.Model):
-    STATUS_PENDING = 'pending'
-    STATUS_COMPLETED = 'completed'
+# class WeeklyCheckInFeedback(models.Model):
+#     STATUS_PENDING = 'pending'
+#     STATUS_COMPLETED = 'completed'
 
-    STATUS_CHOICES = [
-        (STATUS_PENDING, 'Pending'),
-        (STATUS_COMPLETED, 'Completed'),
-    ]
+#     STATUS_CHOICES = [
+#         (STATUS_PENDING, 'Pending'),
+#         (STATUS_COMPLETED, 'Completed'),
+#     ]
 
-    loop = models.ForeignKey(MentorshipLoop, on_delete=models.CASCADE)
-    week_number = models.PositiveSmallIntegerField()
-    mentor_checked_in = models.BooleanField(default=False)
-    mentee_checked_in = models.BooleanField(default=False)
-    progress = models.TextField(blank=True, null=True)
-    challenges = models.TextField(blank=True, null=True)
-    feedback = models.TextField(blank=True, null=True)
-    checkin_date = models.DateField()
-    status = models.CharField(max_length=10, choices=STATUS_CHOICES, default=STATUS_PENDING)
-    created_at = models.DateTimeField(auto_now_add=True)
+#     loop = models.ForeignKey(MentorshipLoop, on_delete=models.CASCADE)
+#     week_number = models.PositiveSmallIntegerField()
+#     mentor_checked_in = models.BooleanField(default=False)
+#     mentee_checked_in = models.BooleanField(default=False)
+#     progress = models.TextField(blank=True, null=True)
+#     challenges = models.TextField(blank=True, null=True)
+#     feedback = models.TextField(blank=True, null=True)
+#     checkin_date = models.DateField()
+#     status = models.CharField(max_length=10, choices=STATUS_CHOICES, default=STATUS_PENDING)
+#     created_at = models.DateTimeField(auto_now_add=True)
 
 
-    class Meta:
-        unique_together = ('loop', 'week_number')
+#     class Meta:
+#         unique_together = ('loop', 'week_number')
 
-    def __str__(self):
-        return f"Check-in for {self.loop} - Week {self.week_number} on {self.checkin_date.strftime('%Y-%m-%d')}"
+#     def __str__(self):
+#         return f"Check-in for {self.loop} - Week {self.week_number} on {self.checkin_date.strftime('%Y-%m-%d')}"
 
-    def clean(self):
-        if not (1 <= self.week_number <= 4):
-            raise ValidationError("Week number must be between 1 and 4.")
+#     def clean(self):
+#         if not (1 <= self.week_number <= 4):
+#             raise ValidationError("Week number must be between 1 and 4.")
         
-    def save(self, *args, **kwargs):
-        # Auto-update status
-        if self.mentor_checked_in and self.mentee_checked_in:
-            self.status = self.STATUS_COMPLETED
-        else:
-            self.status = self.STATUS_PENDING
-        super().save(*args, **kwargs)
+#     def save(self, *args, **kwargs):
+#         # Auto-update status
+#         if self.mentor_checked_in and self.mentee_checked_in:
+#             self.status = self.STATUS_COMPLETED
+#         else:
+#             self.status = self.STATUS_PENDING
+#         super().save(*args, **kwargs)

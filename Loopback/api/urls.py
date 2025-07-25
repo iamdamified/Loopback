@@ -1,9 +1,9 @@
 from django.urls import path, include
 # from rest_framework.authtoken.views import obtain_auth_token
 from users.views import CustomTokenView, RegisterView, ResendVerificationEmailView, VerifyEmailView, PasswordResetRequestView, PasswordResetConfirmView, CustomGoogleLoginView, CompleteGoogleUserProfileView, LogoutView
-from matchrequest.views import MatchRequestView, MatchResponseView, MentorMatchesRequestsView, MenteeMatchesRequestsView, CreateMeetingScheduleView, MentorMeetingScheduleView, MenteeMeetingScheduleView
+from matchrequest.views import MatchRequestView, MatchResponseView, MentorMatchesRequestsView, MenteeMatchesRequestsView
 from mentorship.views import CreateMentorshipLoopView, UpdateMentorshipLoopView, RefreshLoopStatusView, MentorLoopsListView, MenteeLoopsListView
-from weeklycheckin.views import GoogleCalendarCheckInCreateView, UserCheckInMeetingsView, WeeklyCheckInFeedback, WeeklyCheckInListCreateView
+from weeklycheckin.views import GoogleCalendarCheckInCreateView, UserCheckInMeetingsView
 from feedback.views import SubmitFeedbackView, UserFeedbackListView, AllFeedbackListView
 from profiles.views import MentorProfileDetailView, MenteeProfileDetailView, AllMentorsListView, SuggestedMentorsListView, AllMenteesListView, MenteeDetailView, MentorDetailView
 from rest_framework_simplejwt.views import TokenRefreshView
@@ -65,12 +65,12 @@ urlpatterns = [
     path("match-response/<match_request_id>/", MatchResponseView.as_view(), name="match-response"),
     path('match-requests/mentors/', MentorMatchesRequestsView.as_view(), name='mentor-match-requests'),
     path('match-requests/mentees/', MenteeMatchesRequestsView.as_view(), name='mentee-match-requests'),
-    path('meeting-schedule/<int:match_request_id>/', CreateMeetingScheduleView.as_view(), name='create-meeting'),
+    # path('meeting-schedule/<int:match_request_id>/', CreateMeetingScheduleView.as_view(), name='create-meeting'),
 
 
     #Introductory Meeting Schedule  (currently not used)
-    path('meeting/mentor/', MentorMeetingScheduleView.as_view(), name='mentor-meetings'),
-    path('meeting/mentee/', MenteeMeetingScheduleView.as_view(), name='mentee-meetings'),
+    # path('meeting/mentor/', MentorMeetingScheduleView.as_view(), name='mentor-meetings'),
+    # path('meeting/mentee/', MenteeMeetingScheduleView.as_view(), name='mentee-meetings'),
 
     # MENTORSHIP
     path('loops/create/', CreateMentorshipLoopView.as_view(), name='create_mentorship_loop'),
@@ -84,8 +84,8 @@ urlpatterns = [
     
 
     # Weekly Checkins (currently not used)
-    path("weekly-checkin/", WeeklyCheckInListCreateView.as_view(), name="weekly-checkin"),
-    path("weekly-checkin-feedback/", WeeklyCheckInFeedback.as_view(), name="weekly-checkin-feedback"),
+    # path("weekly-checkin/", WeeklyCheckInListCreateView.as_view(), name="weekly-checkin"),
+    # path("weekly-checkin-feedback/", WeeklyCheckInFeedback.as_view(), name="weekly-checkin-feedback"),
 
     # Google Calendar Weekly_Checkin and Meeting_before_Loop Creation
     path("checkins/schedule/", GoogleCalendarCheckInCreateView.as_view(), name="schedule-checkin"),#Frontend

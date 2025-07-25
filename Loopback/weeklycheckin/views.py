@@ -6,14 +6,15 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from django.shortcuts import get_object_or_404
 from api.tasks import send_checkin_completed_email, send_loop_completion_email
-from rest_framework.exceptions import PermissionDenied
-from mentorship.models import MentorshipLoop
 from rest_framework.response import Response
 from rest_framework import status, permissions
 from .serializers import WeeklyCheckInSerializer
 from .models import WeeklyCheckIn
-from matchrequest.models import MatchRequest
 from django.db.models import Q
+# from rest_framework.exceptions import PermissionDenied
+# from mentorship.models import MentorshipLoop
+# from matchrequest.models import MatchRequest
+
 
 
 class GoogleCalendarCheckInCreateView(APIView):
@@ -69,11 +70,7 @@ class GoogleCalendarCheckInCreateView(APIView):
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import permissions, status
-from django.db.models import Q
 from django.core.exceptions import ObjectDoesNotExist
-
-from .models import WeeklyCheckIn
-from .serializers import WeeklyCheckInSerializer
 
 
 class UserCheckInMeetingsView(APIView):
@@ -193,54 +190,54 @@ class UserCheckInMeetingsView(APIView):
 
 
 
-from .models import WeeklyCheckInFeedback
-from .serializers import WeeklyCheckInFeedbackSerializer
+# from .models import WeeklyCheckInFeedback
+# from .serializers import WeeklyCheckInFeedbackSerializer
 
-class WeeklyCheckInFeedback(generics.CreateAPIView, generics.UpdateAPIView):
-    # POST to create, PUT/PATCH to update check-in feedback
-    serializer_class = WeeklyCheckInFeedbackSerializer
-    permission_classes = [permissions.IsAuthenticated]  # Optional: adjust as needed
+# class WeeklyCheckInFeedback(generics.CreateAPIView, generics.UpdateAPIView):
+#     # POST to create, PUT/PATCH to update check-in feedback
+#     serializer_class = WeeklyCheckInFeedbackSerializer
+#     permission_classes = [permissions.IsAuthenticated]  # Optional: adjust as needed
 
-    def get_queryset(self):
-        return WeeklyCheckInFeedback.objects.all()
+#     def get_queryset(self):
+#         return WeeklyCheckInFeedback.objects.all()
 
-    def get_object(self):
-        loop_id = self.request.data.get('loop')
-        week_number = self.request.data.get('week_number')
-        return WeeklyCheckInFeedback.objects.get(loop_id=loop_id, week_number=week_number)
+#     def get_object(self):
+#         loop_id = self.request.data.get('loop')
+#         week_number = self.request.data.get('week_number')
+#         return WeeklyCheckInFeedback.objects.get(loop_id=loop_id, week_number=week_number)
     
 
 
 
-class WeeklyCheckInListCreateView(generics.ListCreateAPIView):
-    serializer_class = WeeklyCheckInSerializer
-    permission_classes = [permissions.IsAuthenticated]
+# class WeeklyCheckInListCreateView(generics.ListCreateAPIView):
+#     serializer_class = WeeklyCheckInSerializer
+#     permission_classes = [permissions.IsAuthenticated]
 
-    def get_queryset(self):
-        user = self.request.user
-        return WeeklyCheckIn.objects.filter(
-            loop__mentor__user=user
-        ) | WeeklyCheckIn.objects.filter(
-            loop__mentee__user=user
-        )
+#     def get_queryset(self):
+#         user = self.request.user
+#         return WeeklyCheckIn.objects.filter(
+#             loop__mentor__user=user
+#         ) | WeeklyCheckIn.objects.filter(
+#             loop__mentee__user=user
+#         )
 
-    def perform_create(self, serializer):
-        user = self.request.user
-        loop = serializer.validated_data.get("loop")
+#     def perform_create(self, serializer):
+#         user = self.request.user
+#         loop = serializer.validated_data.get("loop")
 
-        if loop.status not in ["ongoing", "completed"]:
-            raise PermissionDenied("You can only check into loops that are ongoing or completed.")
+#         if loop.status not in ["ongoing", "completed"]:
+#             raise PermissionDenied("You can only check into loops that are ongoing or completed.")
 
-        if loop.mentor.user != user and loop.mentee.user != user:
-            raise PermissionDenied("You are not part of this mentorship loop.")
+#         if loop.mentor.user != user and loop.mentee.user != user:
+#             raise PermissionDenied("You are not part of this mentorship loop.")
 
-        current_week_count = WeeklyCheckIn.objects.filter(loop=loop).count()
-        instance = serializer.save(week_number=current_week_count + 1)
+#         current_week_count = WeeklyCheckIn.objects.filter(loop=loop).count()
+#         instance = serializer.save(week_number=current_week_count + 1)
 
-        if instance.status == WeeklyCheckIn.STATUS_COMPLETED:
-            send_checkin_completed_email.delay(instance.id)
-            if instance.week_number == 4:
-                send_loop_completion_email.delay(instance.loop.id)
+#         if instance.status == WeeklyCheckIn.STATUS_COMPLETED:
+#             send_checkin_completed_email.delay(instance.id)
+#             if instance.week_number == 4:
+#                 send_loop_completion_email.delay(instance.loop.id)
 
 
                 
