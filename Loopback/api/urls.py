@@ -82,14 +82,15 @@ urlpatterns = [
     # /?status=completed
     # /?status=pending
     
+    # Google Calendar Weekly_Checkin and Meeting_before_Loop Creation
+    path("checkins/schedule/", GoogleCalendarCheckInCreateView.as_view(), name="schedule-checkin"),#Frontend Checking Creation
+    path('user/meetings/', UserCheckInMeetingsView.as_view(), name='user-checkin-meetings'),
 
-    # Weekly Checkins (currently not used)
-    path("weekly-checkin/", WeeklyCheckInListCreateView.as_view(), name="weekly-checkin"),
+    # Weekly Checkins
+    path("weekly-checkin/", WeeklyCheckInListCreateView.as_view(), name="weekly-checkin"), # checkin history information of a user
     # path("weekly-checkin-feedback/", WeeklyCheckInFeedback.as_view(), name="weekly-checkin-feedback"),
 
-    # Google Calendar Weekly_Checkin and Meeting_before_Loop Creation
-    path("checkins/schedule/", GoogleCalendarCheckInCreateView.as_view(), name="schedule-checkin"),#Frontend
-    path('user/meetings/', UserCheckInMeetingsView.as_view(), name='user-checkin-meetings'),
+
     # To filter and view a specific user's meeting, you can use : GET /api/meetings/?google_event_id=abc123
     # path('sync-google-calendar/', GoogleCalendarSyncView.as_view(), name='sync-google-calendar'),#BAckend
 

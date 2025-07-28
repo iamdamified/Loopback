@@ -8,6 +8,7 @@ from datetime import timedelta
 from django.utils import timezone
 
 
+
 User = get_user_model()
 
 @shared_task

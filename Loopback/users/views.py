@@ -29,38 +29,6 @@ from rest_framework.permissions import IsAuthenticated
 
 User = get_user_model()
 
-# # User Registrations with Verification(Mentors and Mentees)
-# class RegisterView(APIView):
-#     def post(self, request):
-#         serializer = UserRegistrationSerializer(data=request.data)
-#         if serializer.is_valid():
-#             user = serializer.save()
-#             user.is_active = False  # Block login until email is verified
-#             user.save()
-
-#             # Generate email verification token
-#             token = default_token_generator.make_token(user)
-#             uid = urlsafe_base64_encode(force_bytes(user.pk))
-
-#             verify_url = f"http://loopback-f6mg.onrender.com/api/auth/verify-email/{uid}/{token}/"
-#             # Attempt to send verification email
-#             try:
-#                 send_mail(
-#                     subject="Verify your Email",
-#                     message=f"Click the link to verify your account: {verify_url}",
-#                     from_email=settings.DEFAULT_FROM_EMAIL,
-#                     recipient_list=[user.email],
-#                     fail_silently=False
-#                 )
-#             except Exception as e:
-#                 print(f"Failed to send verification email: {e}")
-
-#             return Response(
-#                 {'message': 'Registration successful! Check your email to verify your account.'},
-#                 status=status.HTTP_201_CREATED
-#             )
-#         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
 
 
 # fix for expired sendgrid

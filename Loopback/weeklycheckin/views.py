@@ -14,6 +14,10 @@ from django.db.models import Q
 from rest_framework.exceptions import PermissionDenied
 from mentorship.models import MentorshipLoop
 from matchrequest.models import MatchRequest
+from django.conf import settings
+from django.core.mail import send_mail
+from django.core.exceptions import ObjectDoesNotExist
+
 
 
 
@@ -22,19 +26,7 @@ class GoogleCalendarCheckInCreateView(APIView):
 
     def post(self, request, *args, **kwargs):
         data = request.data
-        # Expected payload example from frontend:
-        # {
-        #     "loop": 1, will have field  week_number:1 OR  "match": 1, has no week_number
-        #     "google_event_id": "abc123",
-        #     "week_number": 2,
-        #     "weekly_goals": "Discuss project progress",
-        #     "scheduled_date": "2025-06-25",
-        #     "start_time": "10:00:00",
-        #     "end_time": "11:00:00",
-        #     "meetining_link": "https://meet.google.com/xyz-defg"
-        # }
 
-        # Prevent duplicate events
         if WeeklyCheckIn.objects.filter(google_event_id=data.get("google_event_id")).exists():
             return Response({"error": "Meeting already exists."}, status=400)
 
@@ -45,16 +37,63 @@ class GoogleCalendarCheckInCreateView(APIView):
         loop = data.get("loop")
         match = data.get("match")
 
-        # Compute the correct week_number if it's tied to a loop
         if loop:
             current_week_count = WeeklyCheckIn.objects.filter(loop_id=loop).count()
             instance = serializer.save(week_number=current_week_count + 1)
         else:
-            instance = serializer.save()  # match check-ins don’t get week_number
+            instance = serializer.save()
 
         instance = serializer.save(checkin_created=True)
 
-        # Trigger notification logic
+        # Send email to mentee
+        try:
+            if loop:
+                loop_obj = MentorshipLoop.objects.select_related('mentee__user', 'mentor__user').get(id=loop)
+                mentee = loop_obj.mentee
+                mentor = loop_obj.mentor
+                start_date = loop_obj.start_date
+                end_date = loop_obj.end_date
+                purpose = loop_obj.purpose
+            elif match:
+                match_obj = MatchRequest.objects.select_related('mentee__user', 'mentor__user').get(id=match)
+                mentee = match_obj.mentee
+                mentor = match_obj.mentor
+                start_date = instance.scheduled_date
+                end_date = instance.scheduled_date
+                purpose = instance.weekly_goals
+            else:
+                raise ValueError("Neither loop nor match was provided.")
+
+            send_mail(
+                subject='🗓️ A New Check-in Has Been Scheduled!',
+                message=f"""
+Hi {mentee.user.first_name},
+
+A new check-in meeting has been scheduled by your mentor {mentor.user.first_name} {mentor.user.last_name}.
+
+📝 Goals: {purpose or 'No goals provided'}
+📅 Date: {instance.scheduled_date}
+⏰ Time: {instance.start_time} - {instance.end_time}
+🔗 Meeting Link: {instance.meetining_link or 'No link provided'}
+
+Please prepare and make the most of your session!
+
+Best,  
+The Loopback Mentorship Team
+""".strip(),
+                from_email=settings.DEFAULT_FROM_EMAIL,
+                recipient_list=[mentee.user.email],
+                fail_silently=False
+            )
+
+        except Exception as e:
+            print(f"Check-in created, but failed to send mentee email: {e}")
+            return Response({
+                "message": "Check-in created, but failed to send mentee an email.",
+                "data": WeeklyCheckInSerializer(instance).data
+            }, status=201)
+
+        # Post-check-in notification logic
         if instance.status == WeeklyCheckIn.STATUS_COMPLETED:
             send_checkin_completed_email.delay(instance.id)
 
@@ -62,9 +101,60 @@ class GoogleCalendarCheckInCreateView(APIView):
                 send_loop_completion_email.delay(instance.loop.id)
 
         return Response({
-            "message": "Check-in meeting successfully scheduled.",
+            "message": "Check-in meeting successfully scheduled and mentee notified.",
             "data": WeeklyCheckInSerializer(instance).data
         }, status=status.HTTP_201_CREATED)
+
+
+
+# class GoogleCalendarCheckInCreateView(APIView):
+#     permission_classes = [permissions.IsAuthenticated]
+
+#     def post(self, request, *args, **kwargs):
+#         data = request.data
+#         # Expected payload example from frontend:
+#         # {
+#         #     "loop": 1, will have field  week_number:1 OR  "match": 1, has no week_number
+#         #     "google_event_id": "abc123",
+#         #     "week_number": 2,
+#         #     "weekly_goals": "Discuss project progress",
+#         #     "scheduled_date": "2025-06-25",
+#         #     "start_time": "10:00:00",
+#         #     "end_time": "11:00:00",
+#         #     "meetining_link": "https://meet.google.com/xyz-defg"
+#         # }
+
+#         # Prevent duplicate events
+#         if WeeklyCheckIn.objects.filter(google_event_id=data.get("google_event_id")).exists():
+#             return Response({"error": "Meeting already exists."}, status=400)
+
+#         serializer = WeeklyCheckInSerializer(data=data)
+#         if not serializer.is_valid():
+#             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+#         loop = data.get("loop")
+#         match = data.get("match")
+
+#         # Compute the correct week_number if it's tied to a loop
+#         if loop:
+#             current_week_count = WeeklyCheckIn.objects.filter(loop_id=loop).count()
+#             instance = serializer.save(week_number=current_week_count + 1)
+#         else:
+#             instance = serializer.save()  # match check-ins don’t get week_number
+
+#         instance = serializer.save(checkin_created=True)
+
+#         # Trigger notification logic
+#         if instance.status == WeeklyCheckIn.STATUS_COMPLETED:
+#             send_checkin_completed_email.delay(instance.id)
+
+#             if instance.week_number == 4 and instance.loop:
+#                 send_loop_completion_email.delay(instance.loop.id)
+
+#         return Response({
+#             "message": "Check-in meeting successfully scheduled.",
+#             "data": WeeklyCheckInSerializer(instance).data
+#         }, status=status.HTTP_201_CREATED)
     
 
 from rest_framework.views import APIView
